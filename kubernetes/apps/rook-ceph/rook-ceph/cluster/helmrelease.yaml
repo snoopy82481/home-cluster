@@ -54,7 +54,7 @@ spec:
         enabled: true
         urlPrefix: /
         ssl: false
-        prometheusEndpoint: http://prometheus-operated.monitoring.svc.cluster.local:909
+        prometheusEndpoint: http://prometheus-operated.monitoring.svc.cluster.local:9090
 
       healthCheck:
         muteHealthWarning:
