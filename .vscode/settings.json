@@ -132,6 +132,7 @@
     "system-upgrade": "update",
     "tautulli": "event"
   },
+  "mise.binPath": "~/.local/bin/mise",
   "python.defaultInterpreterPath": "${workspaceFolder}/.venv",
   "sops.defaults.ageKeyFile": "age.key",
   "vs-kubernetes": {
