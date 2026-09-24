@@ -129,7 +129,7 @@
         href: https://grafana.idahobealefamily.com
         icon: grafana.png
         description: Monitoring Dashboard
-        app: grafana
+        app: grafana-service
         namespace: monitoring
         widget:
           type: grafana
