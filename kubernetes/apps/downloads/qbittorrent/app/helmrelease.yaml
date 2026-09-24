@@ -45,7 +45,9 @@ spec:
 
               capabilities:
                 add:
+                  - NET_RAW
                   - NET_ADMIN
+                  - SYS_MODULE
 
           gluetun:
             image: *gluetun-image
