@@ -11,7 +11,7 @@ talosVersion: v1.14.1
 # renovate: datasource=docker depName=ghcr.io/siderolabs/kubelet
 kubernetesVersion: v1.37.1
 # renovate: datasource=github-releases depName=prometheus-operator/prometheus-operator
-prometheusOperatorVersion: v0.94.0
+prometheusOperatorVersion: v0.94.1
 talosImages:
   controlplane: factory.talos.dev/installer-secureboot/6adc7e7fba27948460e2231e5272e88b85159da3f3db980551976bf9898ff64b
   worker: factory.talos.dev/installer-secureboot/6adc7e7fba27948460e2231e5272e88b85159da3f3db980551976bf9898ff64b
