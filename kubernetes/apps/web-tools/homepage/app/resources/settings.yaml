@@ -30,3 +30,9 @@ layout:
     style: row
     columns: 3
     icon: mdi-network
+  Infrastructure:
+    style: row
+    icon: mdi-server
+  Calendar:
+    style: row
+    icon: mdi-calendar

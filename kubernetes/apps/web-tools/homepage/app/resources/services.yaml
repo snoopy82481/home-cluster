@@ -225,19 +225,19 @@
           integrations:
             - type: sonarr
               service_group: Media
-              service_name: Sonarr TV
+              service_name: sonarr
             - type: sonarr
               service_group: Media
-              service_name: Sonarr Anime
+              service_name: sonarranime
             - type: sonarr
               service_group: Media
-              service_name: Sonarr UHD
+              service_name: sonarruhd
             - type: radarr
               service_group: Media
-              service_name: Radarr
+              service_name: radarr
             - type: radarr
               service_group: Media
-              service_name: Radarr Anime
+              service_name: radarranime
             - type: radarr
               service_group: Media
-              service_name: Radarr UHD
+              service_name: radarruhd
