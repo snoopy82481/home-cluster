@@ -39,24 +39,31 @@ def extract_metadata(pr_body: str) -> list[RenovateDep]:
     dependencies: list[RenovateDep] = []
     pattern = re.compile(
         r"^\|\s*(?:\[[^]]+\]\(https:\/\/(?:redirect\.)?github\.com\/"
-        r"(?P<source>[^/)]+\/[^/)#?]+)\)|ghcr\.io/(?P<image>atuinsh/atuin))\s*.*?\|\s*"
+        r"(?P<source>[^/)]+\/[^/)#?]+)\)\s*.*?|"
+        r"ghcr\.io/(?P<image>atuinsh/atuin|siderolabs/kubelet)\s*|"
+        r"registry\.k8s\.io/(?P<kubernetes>kube-(?:apiserver|controller-manager|proxy|scheduler))\s*)\|\s*"
         r"[^|]+\|\s*`(?P<current>[^`]+)`\s*(?:→|->)\s*"
         r"`(?P<new>[^`]+)`\s*\|$",
         re.MULTILINE,
     )
 
     for match in pattern.finditer(pr_body):
-        dependencies.append(
-            {
-                "depName": match.group("source") or match.group("image"),
-                "packageName": match.group("source") or match.group("image"),
-                "manager": "",
-                "datasource": "",
-                "currentVersion": match.group("current"),
-                "newVersion": match.group("new"),
-                "registryUrl": None,
-            }
+        source = (
+            "kubernetes/kubernetes"
+            if match.group("kubernetes")
+            else match.group("source") or match.group("image")
         )
+        dependency: RenovateDep = {
+            "depName": source,
+            "packageName": source,
+            "manager": "",
+            "datasource": "",
+            "currentVersion": match.group("current"),
+            "newVersion": match.group("new"),
+            "registryUrl": None,
+        }
+        if dependency not in dependencies:
+            dependencies.append(dependency)
 
     return dependencies
 

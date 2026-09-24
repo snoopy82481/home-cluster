@@ -10,45 +10,61 @@ spec:
     name: *app
   interval: 1h
   values:
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 1000
+        runAsUser: 1000
+        seccompProfile:
+          type: RuntimeDefault
+
     controllers:
       *app :
-        pod:
-          annotations:
-            reloader.stakater.com/auto: "true"
+        annotations:
+          reloader.stakater.com/auto: "true"
 
         initContainers:
-          gluetun:
-            image:
+          disable-ipv6:
+            image: &gluetun-image
               repository: ghcr.io/qdm12/gluetun
               tag: v3.41.3@sha256:fa19cc76b2af13d57a8d3dc3066f2ada061b1c761b8aecf989b3877c0486e027
 
+            command:
+              - /bin/sh
+              - -c
+              - |
+                ip -6 addr flush dev eth0
+                ip -6 route flush dev eth0 table main
+                ip -6 route del multicast ff00::/8 dev eth0 table local
+                ip -6 route show table all
+                true
+
+            securityContext:
+              allowPrivilegeEscalation: false
+
+              capabilities:
+                add:
+                  - NET_ADMIN
+
+          gluetun:
+            image: *gluetun-image
+
             env:
-              DOT: off
+              DNS_ADDRESS: "10.43.0.10"
+              FIREWALL_INPUT_PORTS: "8080,9999"
+              FIREWALL_OUTBOUND_SUBNETS: 10.43.0.0/16,10.42.0.0/16 # Allow access to k8s subnets
+              FIREWALL_VPN_INPUT_PORTS: &bt-port 51820
+              HEALTH_SERVER_ADDRESS: ":9999"
+              HEALTH_TARGET_ADDRESS: cloudflare.com:443
+              TZ: America/Boise
+
               VPN_INTERFACE: wg0
               VPN_TYPE: wireguard
-              VPN_PORT_FORWARDING: on
-              FIREWALL_OUTBOUND_SUBNETS: 10.43.0.0/16,10.42.0.0/16 # Allow access to k8s subnets
-              FIREWALL_INPUT_PORTS: "8080,9999"
-              HEALTH_SERVER_ADDRESS: ":9999"
-              TZ: America/Boise
 
             envFrom:
               - secretRef:
                   name: vpnconfig
-
-            probes:
-              liveness: &probe
-                enabled: true
-                custom: true
-                spec:
-                  exec: &exec
-                    command: [/gluetun-entrypoint, healthcheck]
-                  periodSeconds: 60
-              startup:
-                <<: *probe
-                spec:
-                  exec: *exec
-                  periodSeconds: 3
 
             lifecycle:
               postStart:
@@ -57,6 +73,28 @@ spec:
                     - /bin/sh
                     - -c
                     - (ip rule del table 51820; ip -6 rule del table 51820) || true
+
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  failureThreshold: 10
+                  httpGet:
+                    port: 9999
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  failureThreshold: 30
+
+                  httpGet:
+                    path: /
+                    port: 9999
+                  initialDelaySeconds: 10
+                  periodSeconds: 10
 
             resources:
               requests:
@@ -70,49 +108,55 @@ spec:
             restartPolicy: Always
 
             securityContext:
-              privileged: true
-              runAsUser: 0
-              runAsGroup: 0
               capabilities:
                 add:
                   - NET_RAW
                   - NET_ADMIN
                   - SYS_MODULE
 
+              privileged: true
+              runAsGroup: 0
+              runAsUser: 0
+
         containers:
           *app :
-            nameOverride: *app
-
             image:
               repository: ghcr.io/home-operations/qbittorrent-libtorrentv1
               tag: 5.2.3@sha256:8a15de24cabfca8041788773436cb176378ff7735e5cb0b2fd94984d4fac6968
 
             env:
-              TZ: America/Boise
-              UMASK: "022"
+              QBT_TORRENTING_PORT: *bt-port
               QBT_WEBUI_PORT: &port 8080
-              QBT_TORRENTING_PORT: 51820
-              QBT__Preferences__WebUI__AuthSubnetWhitelistEnabled: true
-              QBT__Preferences__WebUI__AuthSubnetWhitelist: |-
-                192.168.0.0/24, 192.168.20.0/24, 10.43.0.0/16, 10.42.0.0/16
               QBT__BitTorrent__Session__Interface: wg0
               QBT__BitTorrent__Session__InterfaceAddress: "0.0.0.0"
               QBT__BitTorrent__Session__InterfaceName: wg0
               QBT__Preferences__WebUI__AlternativeUIEnabled: true
 
-            securityContext:
-              runAsNonRoot: true
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities:
-                drop:
-                  - ALL
+              QBT__Preferences__WebUI__AuthSubnetWhitelist: |-
+                192.168.0.0/24, 192.168.20.0/24, 10.43.0.0/16, 10.42.0.0/16
+              QBT__Preferences__WebUI__AuthSubnetWhitelistEnabled: true
+              TZ: America/Boise
+              UMASK: "022"
+
+            nameOverride: *app
 
             probes:
               liveness:
                 enabled: true
+                spec:
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
               readiness:
                 enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/v2/app/version
+                    port: *port
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 5
               startup:
                 enabled: true
                 spec:
@@ -126,30 +170,55 @@ spec:
               limits:
                 memory: 8192Mi
 
-    defaultPodOptions:
-      securityContext:
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
-        fsGroupChangePolicy: OnRootMismatch
-        seccompProfile:
-          type: RuntimeDefault
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - ALL
 
-    service:
-      *app :
-        controller: *app
-        ports:
-          http:
-            port: *port
+              readOnlyRootFilesystem: true
+              runAsNonRoot: true
 
-    route:
+    networkpolicies:
       *app :
-        enabled: true
-        parentRefs:
-          - name: envoy-internal
-            namespace: networking
-        hostnames:
-          - "{{ .Release.Name }}.idahobealefamily.com"
+        egress:
+          - toEntities:
+              - world
+            toPorts:
+              - ports:
+                  - port: "51820"
+                    protocol: UDP
+                  - port: "1194"
+                    protocol: UDP
+          - toCIDRSet:
+              - cidr: 192.168.0.0/16
+            toPorts:
+              - ports:
+                  - port: "8080"
+                    protocol: TCP
+          - toEntities:
+              - cluster
+
+        endpointSelector: {}
+        ingress:
+          - fromEndpoints:
+              - matchLabels:
+                  app: qbittorrent
+            toPorts:
+              - ports:
+                  - port: "51820"
+                    protocol: UDP
+                  - port: "1194"
+                    protocol: UDP
+          - fromCIDRSet:
+              - cidr: 192.168.0.0/16
+            toPorts:
+              - ports:
+                  - port: "8080"
+                    protocol: TCP
+          - fromEntities:
+              - cluster
+        type: cilium
 
     persistence:
       config:
@@ -159,21 +228,41 @@ spec:
             *app :
               - path: /config
 
-      media:
+      gluetun:
+        type: secret
+        name: gluetun-secret
+        advancedMounts:
+          *app :
+            gluetun:
+              - path: /gluetun/auth/config.toml
+                readOnly: true
+                subPath: config.toml
+
+      torrents:
         type: nfs
-        server: truenas.internal
         path: /mnt/storage1/data
+        server: truenas.internal
         advancedMounts:
           *app :
             *app :
               - path: /media
 
-      tmpfs:
+      tmp:
         type: emptyDir
-        advancedMounts:
-          *app :
-            *app :
-              - path: /add-ons
-                subPath: add-ons
-              - path: /tmp
-                subPath: tmp
+
+    route:
+      *app :
+        enabled: true
+        hostnames:
+          - "{{ .Release.Name }}.idahobealefamily.com"
+
+        parentRefs:
+          - name: envoy-internal
+            namespace: networking
+
+    service:
+      *app :
+        controller: *app
+        ports:
+          http:
+            port: *port

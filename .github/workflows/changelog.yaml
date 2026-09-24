@@ -33,7 +33,7 @@ jobs:
             const sourceUrls = body.matchAll(
               /^\|\s*\[[^\]]+\]\(https:\/\/(?:redirect\.)?github\.com\/([^/)]+\/[^/)#?]+)\)/gim,
             );
-            const shouldRun = /^\|\s*ghcr\.io\/atuinsh\/atuin\s*\|/im.test(body) || Array.from(sourceUrls).some((match) =>
+            const shouldRun = /^\|\s*(?:ghcr\.io\/(?:atuinsh\/atuin|siderolabs\/kubelet)|registry\.k8s\.io\/kube-(?:apiserver|controller-manager|proxy|scheduler))\s*\|/im.test(body) || Array.from(sourceUrls).some((match) =>
               supportedSources.has(match[1].toLowerCase()),
             );
 
