@@ -5,108 +5,150 @@
             href: https://sonarr.idahobealefamily.com
             icon: sonarr.png
             description: TV Shows
+            app: sonarr
+            namespace: media
             widget:
               type: sonarr
               url: http://sonarr.media.svc.cluster.local.:8989
               key: ${SONARR_APIKEY}
+
         - Sonarr Anime:
             href: https://sonarranime.idahobealefamily.com
             icon: sonarr.png
             description: Anime
+            app: sonarranime
+            namespace: media
             widget:
               type: sonarr
               url: http://sonarranime.media.svc.cluster.local.:8989
               key: ${SONARR_ANIME_APIKEY}
+
         - Sonarr UHD:
             href: https://sonarruhd.idahobealefamily.com
             icon: sonarr.png
             description: UHD TV Shows
+            app: sonarruhd
+            namespace: media
             widget:
               type: sonarr
               url: http://sonarruhd.media.svc.cluster.local.:8989
               key: ${SONARR_UHD_APIKEY}
+
     - Radarr:
         - Radarr:
             href: https://radarr.idahobealefamily.com
             icon: radarr.png
             description: Movies
+            app: radarr
+            namespace: media
             widget:
               type: radarr
               url: http://radarr.media.svc.cluster.local.:7878
               key: ${RADARR_APIKEY}
+
         - Radarr Anime:
             href: https://radarranime.idahobealefamily.com
             icon: radarr.png
             description: Anime Movies
+            app: radarranime
+            namespace: media
             widget:
               type: radarr
               url: http://radarranime.media.svc.cluster.local.:7878
               key: ${RADARR_ANIME_APIKEY}
+
         - Radarr UHD:
             href: https://radarruhd.idahobealefamily.com
             icon: radarr.png
             description: UHD Movies
+            app: radarruhd
+            namespace: media
             widget:
               type: radarr
               url: http://radarruhd.media.svc.cluster.local.:7878
               key: ${RADARR_UHD_APIKEY}
+
     - Prowlarr:
         href: https://prowlarr.idahobealefamily.com
         icon: prowlarr.png
         description: Indexer Manager
+        app: prowlarr
+        namespace: media
         widget:
           type: prowlarr
           url: http://prowlarr.media.svc.cluster.local.:9696
           key: ${PROWLARR_APIKEY}
+
     - Seerr:
         href: https://seerr.idahobealefamily.com
         icon: seerr.png
         description: Request Manager
+        app: seerr
+        namespace: media
         widget:
           type: seerr
           url: http://seerr.media.svc.cluster.local.:80
           key: ${SEERR_API_KEY}
+
     - Tautulli:
         href: https://tautulli.idahobealefamily.com
         icon: tautulli.png
         description: Plex Monitoring
+        app: tautulli
+        namespace: media
         widget:
           type: tautulli
           url: http://tautulli.media.svc.cluster.local.:8181
           key: ${TAUTULLI_API_KEY}
+          enableNowPlaying: true
+
 - Downloads:
     - Sabnzbd:
         href: https://sabnzbd.idahobealefamily.com
         icon: sabnzbd.png
         description: Usenet Downloader
+        app: sabnzbd
+        namespace: media
         widget:
           type: sabnzbd
           url: http://sabnzbd.media.svc.cluster.local.:8080
           key: ${SABNZBD_API_KEY}
+
     - qBittorrent:
         href: https://qbittorrent.idahobealefamily.com
         icon: qbittorrent.png
         description: Torrent Downloader
+        app: qbittorrent
+        namespace: downloads
         widget:
           type: qbittorrent
           url: http://qbittorrent.downloads.svc.cluster.local.:8080
+
 - Monitoring:
     - Grafana:
         href: https://grafana.idahobealefamily.com
         icon: grafana.png
         description: Monitoring Dashboard
+        app: grafana
+        namespace: monitoring
         widget:
           type: grafana
+          version: 2
+          alerts: alertmanager
           url: http://grafana-service.monitoring.svc.cluster.local.:3000
           username: ${GRAFANA_ADMIN_USER}
           password: ${GRAFANA_ADMIN_PASSWORD}
+
     - Prometheus Metrics:
         href: https://prometheus.idahobealefamily.com
         icon: prometheus.png
         description: Monitoring Metrics
+        app: prometheus
+        namespace: monitoring
         widget:
           type: prometheus
           url: http://prometheus-operated.monitoring.svc.cluster.local:9090
+
 - Storage:
     - TrueNAS:
         href: https://truenas.internal
@@ -117,6 +159,7 @@
           url: https://truenas.internal
           version: 2
           key: ${TRUENAS_AUDIT_API_KEY}
+
 - Networking:
     - Omada:
         href: https://${SVC_OMADA_ADDRESS}:8043
@@ -128,6 +171,7 @@
           username: ${OMADA_ADMIN_USER}
           password: ${OMADA_ADMIN_PASSWORD}
           site: home
+
     - pfSense:
         href: https://pfsense.idahobealefamily.com:10443
         icon: pfsense.png
@@ -143,19 +187,24 @@
             - load
             - memory
             - wanStatus
+
     - Cloudflared:
         href: https://dash.cloudflare.com/
         icon: cloudflare-zero-trust.png
         description: Cloudflared Tunnel
+        app: cloudflared
+        namespace: networking
         widget:
           type: cloudflared
           accountid: ${CLOUDFLARE_ACCOUNT_ID}
           tunnelid: ${CLOUDFLARE_TUNNEL_ID}
           key: ${CLOUDFLARE_HOMEPAGE_API_TOKEN}
+
     - Cisco CBS350:
         href: https://cisco-cbs350.idahobealefamily.com
         icon: si-cisco
         description: "Cisco CBS350 Switch Management"
+
 - Infrastructure:
     - Proxmox:
         href: https://proxmox.idahobealefamily.com:8006
@@ -166,3 +215,29 @@
           url: https://proxmox.idahobealefamily.com:8006
           username: ${PROXMOX_TOKEN_ID}
           password: ${PROXMOX_TOKEN_SECRET}
+
+- Calendar:
+    - Agenda:
+        widget:
+          type: calendar
+          view: agenda
+          maxEvents: 5
+          integrations:
+            - type: sonarr
+              service_group: Media
+              service_name: Sonarr TV
+            - type: sonarr
+              service_group: Media
+              service_name: Sonarr Anime
+            - type: sonarr
+              service_group: Media
+              service_name: Sonarr UHD
+            - type: radarr
+              service_group: Media
+              service_name: Radarr
+            - type: radarr
+              service_group: Media
+              service_name: Radarr Anime
+            - type: radarr
+              service_group: Media
+              service_name: Radarr UHD
