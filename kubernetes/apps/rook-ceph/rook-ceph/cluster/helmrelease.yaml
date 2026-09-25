@@ -25,6 +25,7 @@ spec:
           gethomepage.dev/group: Storage
           gethomepage.dev/description: "Rook Ceph Storage Dashboard"
           gethomepage.dev/icon: rook.png
+          gethomepage.dev/app: rook-ceph-mgr
         host:
           name: rook.idahobealefamily.com
           path: /

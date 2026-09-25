@@ -129,7 +129,7 @@
         href: https://grafana.idahobealefamily.com
         icon: grafana.png
         description: Monitoring Dashboard
-        app: grafana-service
+        app: grafana
         namespace: monitoring
         widget:
           type: grafana
@@ -192,7 +192,7 @@
         href: https://dash.cloudflare.com/
         icon: cloudflare-zero-trust.png
         description: Cloudflared Tunnel
-        app: cloudflared
+        app: cloudflare-tunnel
         namespace: networking
         widget:
           type: cloudflared
@@ -225,19 +225,19 @@
           integrations:
             - type: sonarr
               service_group: Media
-              service_name: sonarr
+              service_name: Sonarr TV
             - type: sonarr
               service_group: Media
-              service_name: sonarranime
+              service_name: Sonarr Anime
             - type: sonarr
               service_group: Media
-              service_name: sonarruhd
+              service_name: Sonarr UHD
             - type: radarr
               service_group: Media
-              service_name: radarr
+              service_name: Radarr
             - type: radarr
               service_group: Media
-              service_name: radarranime
+              service_name: Radarr Anime
             - type: radarr
               service_group: Media
-              service_name: radarruhd
+              service_name: Radarr UHD

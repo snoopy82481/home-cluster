@@ -32,6 +32,7 @@ Useful examples to inspect when relevant:
 
 - `kubernetes/apps/networking/echo-server/`: minimal web app and route.
 - `kubernetes/apps/media/recyclarr/`: config file mounts and kopiur persistence.
+- `kubernetes/apps/web-tools/it-tools/`: a long-running service with a route, network policy, and configMap mounts.
 - `kubernetes/components/kopiur/backup/`: actual PVC and backup substitutions.
 
 Inspect only the non-secret manifests needed for the task.
