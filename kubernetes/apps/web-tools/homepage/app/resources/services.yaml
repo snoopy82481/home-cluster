@@ -129,12 +129,12 @@
         href: https://grafana.idahobealefamily.com
         icon: grafana.png
         description: Monitoring Dashboard
-        app: grafana
+        app: grafana-operator
         namespace: monitoring
         widget:
           type: grafana
           version: 2
-          alerts: alertmanager
+          alerts: grafana
           url: http://grafana-service.monitoring.svc.cluster.local.:3000
           username: ${GRAFANA_ADMIN_USER}
           password: ${GRAFANA_ADMIN_PASSWORD}
@@ -224,20 +224,20 @@
           maxEvents: 5
           integrations:
             - type: sonarr
-              service_group: Media
+              service_group: Sonarr
               service_name: Sonarr TV
             - type: sonarr
-              service_group: Media
+              service_group: Sonarr
               service_name: Sonarr Anime
             - type: sonarr
-              service_group: Media
+              service_group: Sonarr
               service_name: Sonarr UHD
             - type: radarr
-              service_group: Media
+              service_group: Radarr
               service_name: Radarr
             - type: radarr
-              service_group: Media
+              service_group: Radarr
               service_name: Radarr Anime
             - type: radarr
-              service_group: Media
+              service_group: Radarr
               service_name: Radarr UHD
