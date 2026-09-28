@@ -86,8 +86,8 @@ spec:
           name: sabnzbd-secret
           template:
             data:
-              SABNZBD__API_KEY: "{{ .SABNZBD_NZB_KEY }}"
-              SABNZBD__NZB_KEY: "{{ .SABNZBD_API_KEY }}"
+              SABNZBD__API_KEY: "{{ .SABNZBD_API_KEY }}"
+              SABNZBD__NZB_KEY: "{{ .SABNZBD_NZB_KEY }}"
             engineVersion: v2
 
     persistence:

@@ -65,9 +65,6 @@ spec:
               key: PROWLARR_APIKEY
             secretKey: PROWLARR_APIKEY
           - remoteRef:
-              key: SABNZBD_API_KEY
-            secretKey: SABNZBD_API_KEY
-          - remoteRef:
               key: SEERR_API_KEY
             secretKey: SEERR_API_KEY
           - remoteRef:
@@ -79,6 +76,8 @@ spec:
         dataFrom:
           - extract:
               key: CLOUDFLARE
+          - extract:
+              key: SABNZBD
           - extract:
               key: COMMON
           - find:
