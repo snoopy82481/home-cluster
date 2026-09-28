@@ -92,8 +92,8 @@ spec:
       tmpfs:
         type: emptyDir
         advancedMounts:
-          seerr:
-            seerr:
+          tautulli:
+            tautulli:
               - path: /config/logs
                 subPath: logs
               - path: /tmp
