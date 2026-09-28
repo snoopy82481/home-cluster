@@ -22,8 +22,6 @@ spec:
         metadata:
           name: not-used
         spec:
-          decryption:
-            provider: sops
           deletionPolicy: WaitForTermination
           patches:
             - patch: |-
