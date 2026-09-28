@@ -65,8 +65,15 @@ spec:
       config:
         existingClaim: "{{ .Release.Name }}"
 
-      tmp:
+      tmpfs:
         type: emptyDir
+        advancedMounts:
+          tautulli:
+            tautulli:
+              - path: /app/config/logs
+                subPath: logs
+              - path: /tmp
+                subPath: tmp
 
     route:
       tautulli:
