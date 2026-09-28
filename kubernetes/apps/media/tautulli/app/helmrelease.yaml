@@ -30,9 +30,13 @@ spec:
               tag: 2.18.1@sha256:2cc92abed174f89d4fa75ab98e39af0114f37829e9c675718b264cc80931c4f5
 
             env:
-              TAUTULLI_HTTP_BASE_URL: "https://{{ .Release.Name }}.idahobealefamily.com"
+              TAUTULLI_HTTP_BASE_URL: https://tautulli.idahobealefamily.com
               TAUTULLI_HTTP_PORT: &port 8181
               TZ: America/Boise
+
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
 
             probes:
               liveness: &probes
@@ -61,19 +65,32 @@ spec:
                   - "ALL"
               readOnlyRootFilesystem: true
 
+    externalSecrets:
+      tautulli:
+        enabled: true
+        data:
+          - remoteRef:
+              key: TAUTULLI_API_KEY
+            secretKey: TAUTULLI_API_KEY
+        refreshInterval: 12h
+        secretStoreRef:
+          kind: ClusterSecretStore
+          name: doppler
+        target:
+          creationPolicy: Owner
+          deletionPolicy: Delete
+          name: tautulli-secret
+          template:
+            data:
+              TAUTULLI_API_KEY: "{{ .TAUTULLI_API_KEY }}"
+            engineVersion: v2
+
     persistence:
       config:
         existingClaim: "{{ .Release.Name }}"
 
-      tmpfs:
+      tmp:
         type: emptyDir
-        advancedMounts:
-          tautulli:
-            tautulli:
-              - path: /app/config/logs
-                subPath: logs
-              - path: /tmp
-                subPath: tmp
 
     route:
       tautulli:
