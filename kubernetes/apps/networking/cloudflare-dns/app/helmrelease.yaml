@@ -16,11 +16,16 @@ spec:
       name: cloudflare
 
     env:
-      - name: CF_API_TOKEN
+      - name: &name CF_API_TOKEN
         valueFrom:
           secretKeyRef:
-            name: &secret cluster-secrets
-            key: CLOUDFLARE_API_TOKEN
+            name: &secret cloudflare-dns-secret
+            key: *name
+      - name: &name CF_ZONE_ID
+        valueFrom:
+          secretKeyRef:
+            name: *secret
+            key: *name
 
     extraArgs:
       - --cloudflare-dns-records-per-page=1000
@@ -28,6 +33,7 @@ spec:
       - --crd-source-apiversion=externaldns.k8s.io/v1alpha1
       - --crd-source-kind=DNSEndpoint
       - --gateway-name=envoy-external
+      - --zone-id-filter=$(CF_ZONE_ID)
 
     triggerLoopOnEvent: true
 
@@ -37,7 +43,7 @@ spec:
       - crd
       - gateway-httproute
 
-    txtPrefix: k8s.
+    txtPrefix: k8s.%{record_type}-
 
     txtOwnerId: default
 
@@ -49,10 +55,3 @@ spec:
 
     podAnnotations:
       secret.reloader.stakater.com/reload: *secret
-
-    resources:
-      requests:
-        memory: 100Mi
-        cpu: 25m
-      limits:
-        memory: 250Mi

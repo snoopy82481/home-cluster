@@ -5,7 +5,7 @@ kind: Kustomization
 namespace: rook-ceph
 
 components:
-  - ../../components/common
+  - ../../components/alerts
 
 resources:
   - ./ceph-csi-drivers/ks.yaml

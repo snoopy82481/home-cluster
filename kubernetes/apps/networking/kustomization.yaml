@@ -5,7 +5,7 @@ kind: Kustomization
 namespace: networking
 
 components:
-  - ../../components/common
+  - ../../components/alerts
 
 resources:
   - ./cloudflare-dns/ks.yaml

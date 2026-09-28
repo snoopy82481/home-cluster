@@ -3,23 +3,45 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app cloudflare-tunnel
+  name: cloudflare-tunnel
 spec:
   chartRef:
     kind: OCIRepository
-    name: *app
+    name: cloudflare-tunnel
   interval: 1h
   values:
-    controllers:
-      *app :
-        replicas: 1
-        strategy: RollingUpdate
+    defaultPodOptions:
+      securityContext:
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+        seccompProfile:
+          type: RuntimeDefault
 
+    configMaps:
+      config:
+        data:
+          config.yaml: |-
+            ingress:
+              - hostname: "*.idahobealefamily.com"
+                originRequest:
+                  http2Origin: true
+                  keepAliveTimeout: 3600s
+                  originServerName: external.idahobealefamily.com
+                  tcpKeepAlive: 7200s
+                service: https://envoy-external.{{ .Release.Namespace }}.svc.cluster.local:443
+              - service: http_status:404
+
+    controllers:
+      cloudflare-tunnel:
         annotations:
           reloader.stakater.com/auto: "true"
 
+        replicas: 1
+        strategy: RollingUpdate
+
         containers:
-          *app :
+          cloudflare-tunnel:
             image:
               repository: docker.io/cloudflare/cloudflared
               tag: 2026.9.3@sha256:072c067d25ccbe61d46e18f0d0723255f2bb5304f7317caa95b27031520ff92c
@@ -41,60 +63,46 @@ spec:
                 enabled: true
                 custom: true
                 spec:
+                  failureThreshold: 3
                   httpGet:
                     path: /ready
                     port: &port 8080
                   initialDelaySeconds: 0
                   periodSeconds: 10
                   timeoutSeconds: 1
-                  failureThreshold: 3
               readiness: *probes
-
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities:
-                drop:
-                  - "ALL"
-
             resources:
               requests:
                 cpu: 10m
               limits:
                 memory: 256Mi
 
-    defaultPodOptions:
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 65534
-        runAsGroup: 65534
-        seccompProfile:
-          type: RuntimeDefault
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - "ALL"
+              readOnlyRootFilesystem: true
 
-    service:
-      *app :
-        controller: *app
-        ports:
-          http:
-            port: *port
-
-    serviceMonitor:
-      *app :
-        serviceName: *app
-        endpoints:
-          - port: http
-
-    configMaps:
-      config:
-        data:
-          config.yaml: |-
-            ingress:
-              - hostname: "*.idahobealefamily.com"
-                originRequest:
-                  originServerName: external.idahobealefamily.com
-                  http2Origin: true
-                service: https://envoy-external.{{ .Release.Namespace }}.svc.cluster.local:443
-              - service: http_status:404
+    externalSecrets:
+      cloudflare-tunnel-secret:
+        enabled: true
+        dataFrom:
+          - extract:
+              key: CLOUDFLARE
+        refreshInterval: 12h
+        secretStoreRef:
+          kind: ClusterSecretStore
+          name: doppler
+        target:
+          creationPolicy: Owner
+          deletionPolicy: Delete
+          name: cloudflare-tunnel-secret
+          template:
+            data:
+              TUNNEL_TOKEN: |-
+                {{ toJson (dict "a" .CLOUDFLARE_ACCOUNT_ID "t" .CLOUDFLARE_TUNNEL_ID "s" .CLOUDFLARE_TUNNEL_SECRET) | b64enc }}
+            engineVersion: v2
 
     persistence:
       config-file:
@@ -102,5 +110,18 @@ spec:
         identifier: config
         globalMounts:
           - path: /etc/cloudflared/config.yaml
-            subPath: config.yaml
             readOnly: true
+            subPath: config.yaml
+
+    service:
+      cloudflare-tunnel:
+        controller: cloudflare-tunnel
+        ports:
+          http:
+            port: *port
+
+    serviceMonitor:
+      cloudflare-tunnel:
+        endpoints:
+          - port: http
+        serviceName: cloudflare-tunnel

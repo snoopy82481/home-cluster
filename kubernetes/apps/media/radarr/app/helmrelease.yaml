@@ -3,20 +3,28 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app radarr
+  name: radarr
 spec:
   chartRef:
     kind: OCIRepository
-    name: *app
+    name: radarr
   interval: 1h
   values:
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+
     controllers:
-      *app :
+      radarr:
         annotations:
           reloader.stakater.com/auto: "true"
 
         containers:
-          *app :
+          radarr:
             image:
               repository: ghcr.io/home-operations/radarr
               tag: 6.4.4.10685@sha256:be53998a2d39cfa3c3315b70c7509a6a1f2a10c3aee9337653efc9f4c970430e
@@ -24,7 +32,6 @@ spec:
             env:
               RADARR__APP__INSTANCENAME: Radarr
               RADARR__APP__THEME: dark
-              RADARR__AUTH__APIKEY: ${RADARR_APIKEY}
               RADARR__AUTH__METHOD: External
               RADARR__AUTH__REQUIRED: DisabledForLocalAddresses
               RADARR__LOG__DBENABLED: "False"
@@ -34,35 +41,32 @@ spec:
               RADARR__UPDATE__BRANCH: develop
               TZ: America/Boise
 
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
+
             probes:
               liveness:
                 enabled: true
                 spec:
+                  failureThreshold: 5
                   periodSeconds: 30
                   timeoutSeconds: 5
-                  failureThreshold: 5
               readiness:
                 enabled: true
                 custom: true
                 spec:
+                  failureThreshold: 5
                   httpGet:
                     path: /ping
                     port: *port
                   periodSeconds: 10
                   timeoutSeconds: 5
-                  failureThreshold: 5
               startup:
                 enabled: true
                 spec:
                   failureThreshold: 30
                   periodSeconds: 10
-
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities:
-                drop:
-                  - "ALL"
 
             resources:
               requests:
@@ -70,56 +74,71 @@ spec:
               limits:
                 memory: 4Gi
 
-    defaultPodOptions:
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
-        fsGroupChangePolicy: OnRootMismatch
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - "ALL"
 
-    service:
-      *app :
-        controller: *app
-        ports:
-          http:
-            port: *port
+              readOnlyRootFilesystem: true
 
-    route:
-      *app :
+    externalSecrets:
+      radarr:
         enabled: true
-        parentRefs:
-          - name: envoy-internal
-            namespace: networking
-            sectionName: https
-        hostnames:
-          - "{{ .Release.Name }}.idahobealefamily.com"
+        dataFrom:
+          - extract:
+              key: RADARR
+
+        refreshInterval: 12h
+        secretStoreRef:
+          kind: ClusterSecretStore
+          name: doppler
+        target:
+          creationPolicy: Owner
+          deletionPolicy: Delete
+          name: radarr-secret
+          template:
+            data:
+              RADARR__AUTH__APIKEY: "{{ .RADARR_APIKEY }}"
+            engineVersion: v2
 
     persistence:
-      config:
-        existingClaim: "{{ .Release.Name }}"
-
-      tmpfs:
-        type: emptyDir
-        advancedMounts:
-          *app :
-            *app :
-              - path: /config/logs
-                subPath: logs
-              - path: /tmp
-                subPath: tmp
-
-      media:
-        type: nfs
-        server: truenas.internal
-        path: /mnt/storage1/data
-        globalMounts:
-          - path: /media
-
       backup:
         type: nfs
-        server: truenas.internal
         path: /mnt/storage0/backup
+        server: truenas.internal
         globalMounts:
           - path: /backup
             subPath: "{{ .Release.Name }}"
+      config:
+        existingClaim: "{{ .Release.Name }}"
+
+      media:
+        type: nfs
+        path: /mnt/storage1/data
+        server: truenas.internal
+        globalMounts:
+          - path: /media
+
+      tmpfs:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
+            subPath: tmp
+
+    route:
+      radarr:
+        enabled: true
+        hostnames:
+          - "{{ .Release.Name }}.idahobealefamily.com"
+
+        parentRefs:
+          - name: envoy-internal
+            namespace: networking
+
+    service:
+      radarr:
+        controller: radarr
+        ports:
+          http:
+            port: *port

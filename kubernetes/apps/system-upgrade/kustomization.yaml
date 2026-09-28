@@ -5,7 +5,7 @@ kind: Kustomization
 namespace: system-upgrade
 
 components:
-  - ../../components/common
+  - ../../components/alerts
 
 resources:
   - ./namespace.yaml

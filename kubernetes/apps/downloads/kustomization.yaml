@@ -5,7 +5,7 @@ kind: Kustomization
 namespace: downloads
 
 components:
-  - ../../components/common
+  - ../../components/alerts
   - ../../components/kopiur/secret
 
 resources:

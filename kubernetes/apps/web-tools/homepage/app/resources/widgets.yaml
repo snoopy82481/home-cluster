@@ -20,10 +20,10 @@
       showLabel: true
 - openmeteo:
     label: Home
-    timezone: ${TIMEZONE}
+    timezone: America/Boise
     units: imperial
-    latitude: ${HOME_LATITUDE}
-    longitude: ${HOME_LONGITUDE}
+    latitude: "{{HOMEPAGE_VAR_LATITUDE}}"
+    longitude: "{{HOMEPAGE_VAR_LONGITUDE}}"
     cache: 5
 - datetime:
     text_size: l

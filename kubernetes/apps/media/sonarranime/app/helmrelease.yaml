@@ -3,21 +3,28 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app sonarranime
+  name: sonarranime
 spec:
   chartRef:
     kind: OCIRepository
-    name: *app
+    name: sonarranime
   interval: 1h
   values:
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+
     controllers:
-      *app :
+      sonarranime:
         annotations:
           reloader.stakater.com/auto: "true"
-          configmap.reloader.stakater.com/reload: cluster-settings
 
         containers:
-          *app :
+          sonarranime:
             image:
               repository: ghcr.io/home-operations/sonarr
               tag: 4.0.20.3012@sha256:1f19eb5e0f421418c1a956bbe01310a0141423afe28bd9a4b1dcb8629ff2bce2
@@ -25,7 +32,6 @@ spec:
             env:
               SONARR__APP__INSTANCENAME: "Sonarr Anime"
               SONARR__APP__THEME: dark
-              SONARR__AUTH__APIKEY: ${SONARR_ANIME_APIKEY}
               SONARR__AUTH__METHOD: External
               SONARR__AUTH__REQUIRED: DisabledForLocalAddresses
               SONARR__LOG__DBENABLED: "False"
@@ -35,35 +41,32 @@ spec:
               SONARR__UPDATE__BRANCH: develop
               TZ: America/Boise
 
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
+
             probes:
               liveness:
                 enabled: true
                 spec:
+                  failureThreshold: 5
                   periodSeconds: 30
                   timeoutSeconds: 5
-                  failureThreshold: 5
               readiness:
                 enabled: true
                 custom: true
                 spec:
+                  failureThreshold: 5
                   httpGet:
                     path: /ping
                     port: *port
                   periodSeconds: 10
                   timeoutSeconds: 5
-                  failureThreshold: 5
               startup:
                 enabled: true
                 spec:
                   failureThreshold: 30
                   periodSeconds: 10
-
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities:
-                drop:
-                  - "ALL"
 
             resources:
               requests:
@@ -71,60 +74,73 @@ spec:
               limits:
                 memory: 4Gi
 
-    defaultPodOptions:
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
-        fsGroupChangePolicy: OnRootMismatch
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - "ALL"
+              readOnlyRootFilesystem: true
 
-    service:
-      *app :
-        controller: *app
-        ports:
-          http:
-            port: *port
-
-    route:
-      *app :
+    externalSecrets:
+      sonarranime:
         enabled: true
-        parentRefs:
-          - name: envoy-internal
-            namespace: networking
-            sectionName: https
-        hostnames:
-          - "{{ .Release.Name }}.idahobealefamily.com"
-        rules:
-          - backendRefs:
-              - identifier: *app
-                port: *port
+        dataFrom:
+          - extract:
+              key: SONARR
+        refreshInterval: 12h
+        secretStoreRef:
+          kind: ClusterSecretStore
+          name: doppler
+        target:
+          creationPolicy: Owner
+          deletionPolicy: Delete
+          name: sonarranime-secret
+          template:
+            data:
+              SONARR__AUTH__APIKEY: "{{ .SONARR_ANIME_APIKEY }}"
+            engineVersion: v2
 
     persistence:
-      config:
-        existingClaim: "{{ .Release.Name }}"
-
-      tmpfs:
-        type: emptyDir
-        advancedMounts:
-          *app :
-            *app :
-              - path: /config/logs
-                subPath: logs
-              - path: /tmp
-                subPath: tmp
-
-      media:
-        type: nfs
-        server: truenas.internal
-        path: /mnt/storage1/data
-        globalMounts:
-          - path: /media
-
       backup:
         type: nfs
-        server: truenas.internal
         path: /mnt/storage0/backup
+        server: truenas.internal
         globalMounts:
           - path: /backup
             subPath: sonarr_anime
+
+      config:
+        existingClaim: "{{ .Release.Name }}"
+
+      media:
+        type: nfs
+        path: /mnt/storage1/data
+        server: truenas.internal
+        globalMounts:
+          - path: /media
+
+      tmpfs:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
+            subPath: tmp
+
+    route:
+      sonarranime:
+        enabled: true
+        hostnames:
+          - "{{ .Release.Name }}.idahobealefamily.com"
+        parentRefs:
+          - name: envoy-internal
+            namespace: networking
+        rules:
+          - backendRefs:
+              - identifier: sonarranime
+                port: *port
+
+    service:
+      sonarranime:
+        controller: sonarranime
+        ports:
+          http:
+            port: *port

@@ -6,7 +6,7 @@ kind: Kustomization
 namespace: {{ namespace }}
 
 components:
-  - ../../components/common
+  - ../../components/alerts
 {{ "  - ../../components/kopiur/secret" if storage else "" }}
 
 resources:

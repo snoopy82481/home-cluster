@@ -12,19 +12,15 @@ spec:
   {% endif %}
   interval: 1h
   path: {{ ["./kubernetes/apps", namespace, app_name, "app"] | join("/") }}
+  {% if storage %}
   postBuild:
-    {% if storage %}
     substitute:
       APP: {{ app_name }}
       KOPIUR_CAPACITY: 1Gi
-    {% endif %}
-    substituteFrom:
-      - name: cluster-settings
-        kind: ConfigMap
+  {% endif %}
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
   targetNamespace: {{ namespace }}
-  wait: false

@@ -3,20 +3,28 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app prowlarr
+  name: prowlarr
 spec:
   chartRef:
     kind: OCIRepository
-    name: *app
+    name: prowlarr
   interval: 1h
   values:
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+
     controllers:
-      *app :
+      prowlarr:
         annotations:
           reloader.stakater.com/auto: "true"
 
         containers:
-          *app :
+          prowlarr:
             image:
               repository: ghcr.io/home-operations/prowlarr
               tag: 2.6.5.5623@sha256:6152751c3ea2e7751564f5952173d5e83eed0e09f3fabd2cb6bdb58690c39e2f
@@ -24,7 +32,6 @@ spec:
             env:
               PROWLARR__APP__INSTANCENAME: Prowlarr
               PROWLARR__APP__THEME: dark
-              PROWLARR__AUTH__APIKEY: ${PROWLARR_APIKEY}
               PROWLARR__AUTH__METHOD: External
               PROWLARR__AUTH__REQUIRED: DisabledForLocalAddresses
               PROWLARR__LOG__DBENABLED: "False"
@@ -34,23 +41,27 @@ spec:
               PROWLARR__UPDATE__BRANCH: develop
               TZ: America/Boise
 
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
+
             probes:
               liveness:
                 enabled: true
                 spec:
+                  failureThreshold: 5
                   periodSeconds: 30
                   timeoutSeconds: 5
-                  failureThreshold: 5
               readiness:
                 enabled: true
                 custom: true
                 spec:
+                  failureThreshold: 5
                   httpGet:
                     path: /ping
                     port: *port
                   periodSeconds: 10
                   timeoutSeconds: 5
-                  failureThreshold: 5
               startup:
                 enabled: true
                 spec:
@@ -63,53 +74,55 @@ spec:
               limits:
                 memory: 1Gi
 
-    defaultPodOptions:
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
-        fsGroupChangePolicy: OnRootMismatch
-
-    service:
-      *app :
-        controller: *app
-        ports:
-          http:
-            port: *port
-
-    route:
-      *app :
+    externalSecrets:
+      prowlarr:
         enabled: true
-        parentRefs:
-          - name: envoy-internal
-            namespace: networking
-            sectionName: https
-        hostnames:
-          - "{{ .Release.Name }}.idahobealefamily.com"
-        rules:
-          - backendRefs:
-              - identifier: *app
-                port: *port
+        data:
+          - remoteRef:
+              key: PROWLARR_APIKEY
+            secretKey: PROWLARR__AUTH__APIKEY
+
+        refreshInterval: 12h
+        secretStoreRef:
+          kind: ClusterSecretStore
+          name: doppler
+        target:
+          name: prowlarr-secret
 
     persistence:
+      backup:
+        type: nfs
+        path: /mnt/storage0/backup
+        server: truenas.internal
+        globalMounts:
+          - path: /backup
+            subPath: "{{ .Release.Name }}"
       config:
         existingClaim: "{{ .Release.Name }}"
 
       tmpfs:
         type: emptyDir
-        advancedMounts:
-          *app :
-            *app :
-              - path: /config/logs
-                subPath: logs
-              - path: /tmp
-                subPath: tmp
-
-      backup:
-        type: nfs
-        server: truenas.internal
-        path: /mnt/storage0/backup
         globalMounts:
-          - path: /backup
-            subPath: "{{ .Release.Name }}"
+          - path: /tmp
+            subPath: tmp
+
+    route:
+      prowlarr:
+        enabled: true
+        hostnames:
+          - "{{ .Release.Name }}.idahobealefamily.com"
+        parentRefs:
+          - name: envoy-internal
+            namespace: networking
+
+        rules:
+          - backendRefs:
+              - identifier: prowlarr
+                port: *port
+
+    service:
+      prowlarr:
+        controller: prowlarr
+        ports:
+          http:
+            port: *port

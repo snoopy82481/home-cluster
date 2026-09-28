@@ -13,13 +13,9 @@ spec:
     substitute:
       APP: seerr
       KOPIUR_CAPACITY: 5Gi
-    substituteFrom:
-      - name: cluster-settings
-        kind: ConfigMap
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  wait: false
   targetNamespace: media

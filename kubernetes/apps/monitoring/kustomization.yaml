@@ -5,7 +5,7 @@ kind: Kustomization
 namespace: monitoring
 
 components:
-  - ../../components/common
+  - ../../components/alerts
 
 resources:
   - ./grafana-operator/ks.yaml

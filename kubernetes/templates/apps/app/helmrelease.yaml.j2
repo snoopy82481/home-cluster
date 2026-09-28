@@ -12,14 +12,14 @@ metadata:
 spec:
   chartRef:
     kind: OCIRepository
-    name: *app
+    name: {{ app_name }}
   interval: 1h
   values:
 {% if template_type == "app-template" %}
     controllers:
-      *app :
+      {{ app_name }}:
         containers:
-          *app :
+          {{ app_name }}:
             image:
               repository: #! Change this to the app's image repository
               tag: #! Change this to the app's image tag
@@ -64,14 +64,14 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
 
     service:
-      *app :
-        controller: *app
+      {{ app_name }}:
+        controller: {{ app_name }}
         ports:
           http:
             port: *port
 
     route:
-      *app :
+      {{ app_name }}:
         enabled: true
         parentRefs:
         {% if external %}
@@ -98,8 +98,8 @@ spec:
       tmpfs:
         type: emptyDir
         advancedMounts:
-          *app :
-            *app :
+          {{ app_name }}:
+            {{ app_name }}:
               - path: /config/logs
                 subPath: logs
               - path: /tmp

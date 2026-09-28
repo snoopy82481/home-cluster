@@ -3,26 +3,26 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app echo-server
+  name: echo-server
 spec:
   chartRef:
     kind: OCIRepository
-    name: *app
+    name: echo-server
   interval: 1h
   values:
     controllers:
-      *app :
+      echo-server:
         containers:
-          *app :
+          echo-server:
             image:
               repository: ghcr.io/mendhak/http-https-echo
               tag: 42
 
             env:
-              TZ: America/Boise
               HTTP_PORT: &port 8080
-              LOG_WITHOUT_NEWLINE: "true"
               LOG_IGNORE_PATH: "/healthz"
+              LOG_WITHOUT_NEWLINE: "true"
+              TZ: America/Boise
 
             probes:
               liveness: &probes
@@ -37,18 +37,18 @@ spec:
               limits:
                 memory: 64M
 
-    service:
-      *app :
-        controller: *app
-        ports:
-          http:
-            port: *port
-
     route:
-      *app :
+      echo-server:
         enabled: true
+        hostnames:
+          - "{{ .Release.Name }}.idahobealefamily.com"
         parentRefs:
           - name: envoy-internal
             namespace: networking
-        hostnames:
-          - "{{ .Release.Name }}.idahobealefamily.com"
+
+    service:
+      echo-server:
+        controller: echo-server
+        ports:
+          http:
+            port: *port

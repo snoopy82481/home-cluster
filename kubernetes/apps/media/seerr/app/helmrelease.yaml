@@ -3,54 +3,56 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app seerr
+  name: seerr
 spec:
   chartRef:
     kind: OCIRepository
-    name: *app
+    name: seerr
   interval: 1h
   values:
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+
     controllers:
-      *app :
+      seerr:
         containers:
-          *app :
+          seerr:
             image:
               repository: ghcr.io/seerr-team/seerr
               tag: v3.4.1@sha256:f4768de5f616248d723e05891f3345a1402123775d03bf0890dbfedc0831bda1
 
             env:
-              TZ: America/Boise
               LOG_LEVEL: "info"
               PORT: &port 80
+              TZ: America/Boise
 
             probes:
               liveness:
                 enabled: true
                 spec:
+                  failureThreshold: 5
                   periodSeconds: 30
                   timeoutSeconds: 5
-                  failureThreshold: 5
               readiness:
                 enabled: true
                 custom: true
                 spec:
+                  failureThreshold: 3
                   httpGet:
                     path: /api/v1/status
                     port: *port
                   periodSeconds: 10
                   timeoutSeconds: 1
-                  failureThreshold: 3
               startup:
                 enabled: true
                 spec:
                   failureThreshold: 30
                   periodSeconds: 10
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities:
-                drop:
-                  - "ALL"
 
             resources:
               requests:
@@ -58,29 +60,12 @@ spec:
               limits:
                 memory: 1Gi
 
-    defaultPodOptions:
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
-        fsGroupChangePolicy: OnRootMismatch
-
-    service:
-      *app :
-        controller: *app
-        ports:
-          http:
-            port: *port
-
-    route:
-      *app :
-        enabled: true
-        parentRefs:
-          - name: envoy-external
-            namespace: networking
-        hostnames:
-          - "{{ .Release.Name }}.idahobealefamily.com"
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - "ALL"
+              readOnlyRootFilesystem: true
 
     persistence:
       config:
@@ -91,9 +76,26 @@ spec:
       tmpfs:
         type: emptyDir
         advancedMounts:
-          *app :
-            *app :
+          seerr:
+            seerr:
               - path: /app/config/logs
                 subPath: logs
               - path: /tmp
                 subPath: tmp
+
+    route:
+      seerr:
+        enabled: true
+        hostnames:
+          - "{{ .Release.Name }}.idahobealefamily.com"
+
+        parentRefs:
+          - name: envoy-external
+            namespace: networking
+
+    service:
+      seerr:
+        controller: seerr
+        ports:
+          http:
+            port: *port

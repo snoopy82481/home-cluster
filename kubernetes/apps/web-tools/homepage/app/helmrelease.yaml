@@ -3,28 +3,37 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app homepage
+  name: homepage
 spec:
   chartRef:
     kind: OCIRepository
-    name: *app
+    name: homepage
   interval: 1h
   values:
+    defaultPodOptions:
+      automountServiceAccountToken: true
+      hostUsers: false
+
     controllers:
-      *app :
-        strategy: RollingUpdate
+      homepage:
         annotations:
           reloader.stakater.com/auto: "true"
 
+        strategy: RollingUpdate
+
         containers:
-          *app :
+          homepage:
             image:
               repository: ghcr.io/gethomepage/homepage
               tag: v2.4.0@sha256:643bd0be730d40f69d58028a55d1a896739333e8815786df42bc97f109ecbe61
 
             env:
-              TZ: America/Boise
               HOMEPAGE_ALLOWED_HOSTS: "{{ .Release.Name }}.idahobealefamily.com"
+
+              TZ: America/Boise
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
 
             probes:
               liveness:
@@ -41,27 +50,126 @@ spec:
 
             securityContext:
               allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: false
               capabilities:
                 drop:
                   - ALL
+              readOnlyRootFilesystem: false
 
-    defaultPodOptions:
-      automountServiceAccountToken: true
-      hostUsers: false
+    externalSecrets:
+      homepage:
+        data:
+          - remoteRef:
+              key: PFSENSE_API_KEY
+            secretKey: PFSENSE_API_KEY
+          - remoteRef:
+              key: PROWLARR_APIKEY
+            secretKey: PROWLARR_APIKEY
+          - remoteRef:
+              key: SABNZBD_API_KEY
+            secretKey: SABNZBD_API_KEY
+          - remoteRef:
+              key: SEERR_API_KEY
+            secretKey: SEERR_API_KEY
+          - remoteRef:
+              key: TAUTULLI_API_KEY
+            secretKey: TAUTULLI_API_KEY
+          - remoteRef:
+              key: TRUENAS_AUDIT_API_KEY
+            secretKey: TRUENAS_AUDIT_API_KEY
+        dataFrom:
+          - extract:
+              key: CLOUDFLARE
+          - extract:
+              key: COMMON
+          - find:
+              path: PROXMOX_TOKEN_
+          - extract:
+              key: RADARR
+          - extract:
+              key: SONARR
+          - extract:
+              key: HOME
+        refreshInterval: 12h
+        secretStoreRef:
+          kind: ClusterSecretStore
+          name: doppler
+        target:
+          creationPolicy: Owner
+          name: homepage-secret
+          template:
+            data:
+              HOMEPAGE_VAR_CLOUDFLARE_ACCOUNT_ID: "{{ .CLOUDFLARE_ACCOUNT_ID }}"
+              HOMEPAGE_VAR_CLOUDFLARE_HOMEPAGE_API_TOKEN: "{{ .CLOUDFLARE_HOMEPAGE_API_TOKEN }}"
+              HOMEPAGE_VAR_CLOUDFLARE_TUNNEL_ID: "{{ .CLOUDFLARE_TUNNEL_ID }}"
+              HOMEPAGE_VAR_GRAFANA_ADMIN_PASSWORD: "{{ .ADMIN_PASSWORD }}"
+              HOMEPAGE_VAR_GRAFANA_ADMIN_USER: "{{ .ADMIN_USER }}"
+              HOMEPAGE_VAR_LATITUDE: "{{ .LATITUDE }}"
+              HOMEPAGE_VAR_LONGITUDE: "{{ .LONGITUDE }}"
+              HOMEPAGE_VAR_OMADA_ADMIN_PASSWORD: "{{ .ADMIN_PASSWORD }}"
+              HOMEPAGE_VAR_OMADA_ADMIN_USER: "{{ .ADMIN_USER }}"
+              HOMEPAGE_VAR_PFSENSE_API_KEY: "{{ .PFSENSE_API_KEY }}"
+              HOMEPAGE_VAR_PROWLARR_APIKEY: "{{ .PROWLARR_APIKEY }}"
+              HOMEPAGE_VAR_PROXMOX_TOKEN_ID: "{{ .PROXMOX_TOKEN_ID }}"
+              HOMEPAGE_VAR_PROXMOX_TOKEN_SECRET: "{{ .PROXMOX_TOKEN_SECRET }}"
+              HOMEPAGE_VAR_RADARR_ANIME_APIKEY: "{{ .RADARR_ANIME_APIKEY }}"
+              HOMEPAGE_VAR_RADARR_APIKEY: "{{ .RADARR_APIKEY }}"
+              HOMEPAGE_VAR_RADARR_UHD_APIKEY: "{{ .RADARR_UHD_APIKEY }}"
+              HOMEPAGE_VAR_SABNZBD_API_KEY: "{{ .SABNZBD_API_KEY }}"
+              HOMEPAGE_VAR_SEERR_API_KEY: "{{ .SEERR_API_KEY }}"
+              HOMEPAGE_VAR_SONARR_ANIME_APIKEY: "{{ .SONARR_ANIME_APIKEY }}"
+              HOMEPAGE_VAR_SONARR_APIKEY: "{{ .SONARR_APIKEY }}"
+              HOMEPAGE_VAR_SONARR_UHD_APIKEY: "{{ .SONARR_UHD_APIKEY }}"
+              HOMEPAGE_VAR_TAUTULLI_API_KEY: "{{ .TAUTULLI_API_KEY }}"
+              HOMEPAGE_VAR_TRUENAS_AUDIT_API_KEY: "{{ .TRUENAS_AUDIT_API_KEY }}"
+            engineVersion: v2
 
-    service:
-      *app :
-        controller: *app
-        ports:
-          http:
-            port: &port 3000
+    persistence:
+      config:
+        type: configMap
+        name: homepage-config
+        globalMounts:
+          - path: /app/config/bookmarks.yaml
+            subPath: bookmarks.yaml
+          - path: /app/config/docker.yaml
+            subPath: docker.yaml
+          - path: /app/config/kubernetes.yaml
+            subPath: kubernetes.yaml
+          - path: /app/config/proxmox.yaml
+            subPath: proxmox.yaml
+          - path: /app/config/services.yaml
+            subPath: services.yaml
+          - path: /app/config/settings.yaml
+            subPath: settings.yaml
+          - path: /app/config/widgets.yaml
+            subPath: widgets.yaml
+
+      tmpfs:
+        type: emptyDir
+        advancedMounts:
+          homepage:
+            homepage:
+              - path: /app/config/logs
+                subPath: logs
+              - path: /tmp
+                subPath: tmp
 
     rbac:
+      bindings:
+        clusterrolebinding:
+          enabled: true
+          roleRef:
+            apiGroup: rbac.authorization.k8s.io
+            kind: ClusterRole
+            name: homepage
+          subjects:
+            - kind: ServiceAccount
+              name: homepage
+              namespace: web-tools
+          type: ClusterRoleBinding
+
       roles:
         clusterrole:
           enabled: true
-          type: ClusterRole
           rules:
             - apiGroups:
                 - ""
@@ -111,58 +219,24 @@ spec:
               verbs:
                 - get
                 - list
-      bindings:
-        clusterrolebinding:
-          enabled: true
-          type: ClusterRoleBinding
-          subjects:
-            - kind: ServiceAccount
-              name: *app
-              namespace: web-tools
-          roleRef:
-            apiGroup: rbac.authorization.k8s.io
-            kind: ClusterRole
-            name: *app
+          type: ClusterRole
 
     route:
-      *app :
+      homepage:
         enabled: true
+        hostnames:
+          - "{{ .Release.Name }}.idahobealefamily.com"
         parentRefs:
           - name: envoy-internal
             namespace: networking
-        hostnames:
-          - "{{ .Release.Name }}.idahobealefamily.com"
         rules:
           - backendRefs:
-              - identifier: *app
-                port: *port
+              - identifier: homepage
+                port: &port 3000
 
-    persistence:
-      config:
-        type: configMap
-        name: homepage-config
-        globalMounts:
-          - subPath: bookmarks.yaml
-            path: /app/config/bookmarks.yaml
-          - subPath: docker.yaml
-            path: /app/config/docker.yaml
-          - subPath: kubernetes.yaml
-            path: /app/config/kubernetes.yaml
-          - subPath: proxmox.yaml
-            path: /app/config/proxmox.yaml
-          - subPath: services.yaml
-            path: /app/config/services.yaml
-          - subPath: settings.yaml
-            path: /app/config/settings.yaml
-          - subPath: widgets.yaml
-            path: /app/config/widgets.yaml
-
-      tmpfs:
-        type: emptyDir
-        advancedMounts:
-          *app :
-            *app :
-              - path: /app/config/logs
-                subPath: logs
-              - path: /tmp
-                subPath: tmp
+    service:
+      homepage:
+        controller: homepage
+        ports:
+          http:
+            port: *port

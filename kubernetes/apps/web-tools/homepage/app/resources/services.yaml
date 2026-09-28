@@ -10,7 +10,7 @@
             widget:
               type: sonarr
               url: http://sonarr.media.svc.cluster.local.:8989
-              key: ${SONARR_APIKEY}
+              key: "{{HOMEPAGE_VAR_SONARR_APIKEY}}"
 
         - Sonarr Anime:
             href: https://sonarranime.idahobealefamily.com
@@ -21,7 +21,7 @@
             widget:
               type: sonarr
               url: http://sonarranime.media.svc.cluster.local.:8989
-              key: ${SONARR_ANIME_APIKEY}
+              key: "{{HOMEPAGE_VAR_SONARR_ANIME_APIKEY}}"
 
         - Sonarr UHD:
             href: https://sonarruhd.idahobealefamily.com
@@ -32,7 +32,7 @@
             widget:
               type: sonarr
               url: http://sonarruhd.media.svc.cluster.local.:8989
-              key: ${SONARR_UHD_APIKEY}
+              key: "{{HOMEPAGE_VAR_SONARR_UHD_APIKEY}}"
 
     - Radarr:
         - Radarr:
@@ -44,7 +44,7 @@
             widget:
               type: radarr
               url: http://radarr.media.svc.cluster.local.:7878
-              key: ${RADARR_APIKEY}
+              key: "{{HOMEPAGE_VAR_RADARR_APIKEY}}"
 
         - Radarr Anime:
             href: https://radarranime.idahobealefamily.com
@@ -55,7 +55,7 @@
             widget:
               type: radarr
               url: http://radarranime.media.svc.cluster.local.:7878
-              key: ${RADARR_ANIME_APIKEY}
+              key: "{{HOMEPAGE_VAR_RADARR_ANIME_APIKEY}}"
 
         - Radarr UHD:
             href: https://radarruhd.idahobealefamily.com
@@ -66,7 +66,7 @@
             widget:
               type: radarr
               url: http://radarruhd.media.svc.cluster.local.:7878
-              key: ${RADARR_UHD_APIKEY}
+              key: "{{HOMEPAGE_VAR_RADARR_UHD_APIKEY}}"
 
     - Prowlarr:
         href: https://prowlarr.idahobealefamily.com
@@ -77,7 +77,7 @@
         widget:
           type: prowlarr
           url: http://prowlarr.media.svc.cluster.local.:9696
-          key: ${PROWLARR_APIKEY}
+          key: "{{HOMEPAGE_VAR_PROWLARR_APIKEY}}"
 
     - Seerr:
         href: https://seerr.idahobealefamily.com
@@ -88,7 +88,7 @@
         widget:
           type: seerr
           url: http://seerr.media.svc.cluster.local.:80
-          key: ${SEERR_API_KEY}
+          key: "{{HOMEPAGE_VAR_SEERR_API_KEY}}"
 
     - Tautulli:
         href: https://tautulli.idahobealefamily.com
@@ -99,7 +99,7 @@
         widget:
           type: tautulli
           url: http://tautulli.media.svc.cluster.local.:8181
-          key: ${TAUTULLI_API_KEY}
+          key: "{{HOMEPAGE_VAR_TAUTULLI_API_KEY}}"
           enableNowPlaying: true
 
 - Downloads:
@@ -112,7 +112,7 @@
         widget:
           type: sabnzbd
           url: http://sabnzbd.media.svc.cluster.local.:8080
-          key: ${SABNZBD_API_KEY}
+          key: "{{HOMEPAGE_VAR_SABNZBD_API_KEY}}"
 
     - qBittorrent:
         href: https://qbittorrent.idahobealefamily.com
@@ -136,8 +136,8 @@
           version: 2
           alerts: grafana
           url: http://grafana-service.monitoring.svc.cluster.local.:3000
-          username: ${GRAFANA_ADMIN_USER}
-          password: ${GRAFANA_ADMIN_PASSWORD}
+          username: "{{HOMEPAGE_VAR_GRAFANA_ADMIN_USER}}"
+          password: "{{HOMEPAGE_VAR_GRAFANA_ADMIN_PASSWORD}}"
 
     - Prometheus Metrics:
         href: https://prometheus.idahobealefamily.com
@@ -158,18 +158,18 @@
           type: truenas
           url: https://truenas.internal
           version: 2
-          key: ${TRUENAS_AUDIT_API_KEY}
+          key: "{{HOMEPAGE_VAR_TRUENAS_AUDIT_API_KEY}}"
 
 - Networking:
     - Omada:
-        href: https://${SVC_OMADA_ADDRESS}:8043
+        href: https://omada.internal:8043
         icon: omada.png
         description: Omada Controller
         widget:
           type: omada
-          url: https://${SVC_OMADA_ADDRESS}:8043
-          username: ${OMADA_ADMIN_USER}
-          password: ${OMADA_ADMIN_PASSWORD}
+          url: https://omada.internal:8043
+          username: "{{HOMEPAGE_VAR_OMADA_ADMIN_USER}}"
+          password: "{{HOMEPAGE_VAR_OMADA_ADMIN_PASSWORD}}"
           site: home
 
     - pfSense:
@@ -180,7 +180,7 @@
           type: pfsense
           url: https://pfsense.idahobealefamily.com:10443
           headers:
-            X-API-Key: ${PFSENSE_API_KEY}
+            X-API-Key: "{{HOMEPAGE_VAR_PFSENSE_API_KEY}}"
           wan: ix0
           version: 2
           fields:
@@ -196,9 +196,9 @@
         namespace: networking
         widget:
           type: cloudflared
-          accountid: ${CLOUDFLARE_ACCOUNT_ID}
-          tunnelid: ${CLOUDFLARE_TUNNEL_ID}
-          key: ${CLOUDFLARE_HOMEPAGE_API_TOKEN}
+          accountid: "{{HOMEPAGE_VAR_CLOUDFLARE_ACCOUNT_ID}}"
+          tunnelid: "{{HOMEPAGE_VAR_CLOUDFLARE_TUNNEL_ID}}"
+          key: "{{HOMEPAGE_VAR_CLOUDFLARE_HOMEPAGE_API_TOKEN}}"
 
     - Cisco CBS350:
         href: https://cisco-cbs350.idahobealefamily.com
@@ -213,8 +213,8 @@
         widget:
           type: proxmox
           url: https://proxmox.idahobealefamily.com:8006
-          username: ${PROXMOX_TOKEN_ID}
-          password: ${PROXMOX_TOKEN_SECRET}
+          username: "{{HOMEPAGE_VAR_PROXMOX_TOKEN_ID}}"
+          password: "{{HOMEPAGE_VAR_PROXMOX_TOKEN_SECRET}}"
 
 - Calendar:
     - Agenda:

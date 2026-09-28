@@ -3,26 +3,32 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app sabnzbd
+  name: sabnzbd
 spec:
   chartRef:
     kind: OCIRepository
-    name: *app
+    name: sabnzbd
   interval: 1h
   values:
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+
     controllers:
-      *app :
+      sabnzbd:
         annotations:
           reloader.stakater.com/auto: "true"
 
         containers:
-          *app :
+          sabnzbd:
             image:
               repository: ghcr.io/home-operations/sabnzbd
               tag: 5.1.3@sha256:b1795982db498ed5691a7b1231f0fac7eed2a1d53e9c81b8e834d02695e76104
             env:
-              TZ: America/Boise
-              SABNZBD__PORT: &port 8080
               SABNZBD__HOST_WHITELIST_ENTRIES: >-
                 sabnzbd,
                 sabnzbd.media,
@@ -30,29 +36,26 @@ spec:
                 sabnzbd.media.svc.cluster,
                 sabnzbd.media.svc.cluster.local,
                 {{ .Release.Name }}.idahobealefamily.com
-              SABNZBD__API_KEY: ${SABNZBD_API_KEY}
-              SABNZBD__NZB_KEY: ${SABNZBD_NZB_KEY}
+
+              SABNZBD__PORT: &port 8080
+              TZ: America/Boise
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
 
             probes:
               liveness: &probes
                 enabled: true
                 custom: true
                 spec:
+                  failureThreshold: 3
                   httpGet:
                     path: /api?mode=version
                     port: *port
                   initialDelaySeconds: 0
                   periodSeconds: 10
                   timeoutSeconds: 1
-                  failureThreshold: 3
               readiness: *probes
-
-            securityContext: &securityContext
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities:
-                drop:
-                  - "ALL"
 
             resources:
               requests:
@@ -60,65 +63,83 @@ spec:
               limits:
                 memory: 8Gi
 
-    defaultPodOptions:
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
-        fsGroupChangePolicy: OnRootMismatch
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - "ALL"
+              readOnlyRootFilesystem: true
 
-    service:
-      *app :
-        controller: *app
-        ports:
-          http:
-            port: *port
-
-    route:
-      *app :
+    externalSecrets:
+      sabnzbd:
         enabled: true
-        parentRefs:
-          - name: envoy-internal
-            namespace: networking
-            sectionName: https
-        hostnames:
-          - "{{ .Release.Name }}.idahobealefamily.com"
-        rules:
-          - backendRefs:
-              - identifier: *app
-                port: *port
+        dataFrom:
+          - extract:
+              key: SABNZBD
+        refreshInterval: 12h
+        secretStoreRef:
+          kind: ClusterSecretStore
+          name: doppler
+        target:
+          creationPolicy: Owner
+          deletionPolicy: Delete
+          name: sabnzbd-secret
+          template:
+            data:
+              SABNZBD__API_KEY: "{{ .SABNZBD_NZB_KEY }}"
+              SABNZBD__NZB_KEY: "{{ .SABNZBD_API_KEY }}"
+            engineVersion: v2
 
     persistence:
+      backup:
+        type: nfs
+        path: /mnt/storage0/backup
+        server: truenas.internal
+        globalMounts:
+          - path: /backup
+            subPath: "{{ .Release.Name }}"
+
       config:
         existingClaim: "{{ .Release.Name }}"
 
       media:
         type: nfs
-        server: truenas.internal
         path: /mnt/storage1/data
+        server: truenas.internal
         globalMounts:
           - path: /media
 
-      backup:
-        type: nfs
-        server: truenas.internal
-        path: /mnt/storage0/backup
-        globalMounts:
-          - path: /backup
-            subPath: "{{ .Release.Name }}"
-
       scripts:
         type: configMap
-        name: sabnzbd-scripts
         defaultMode: 0755
+        name: sabnzbd-scripts
         globalMounts:
           - path: /scripts/clean.py
-            subPath: clean.py
             readOnly: true
+            subPath: clean.py
           - path: /scripts/replace_for.py
-            subPath: replace_for.py
             readOnly: true
 
+            subPath: replace_for.py
       tmp:
         type: emptyDir
+
+    route:
+      sabnzbd:
+        enabled: true
+        hostnames:
+          - "{{ .Release.Name }}.idahobealefamily.com"
+        parentRefs:
+          - name: envoy-internal
+            namespace: networking
+        rules:
+          - backendRefs:
+              - identifier: sabnzbd
+                port: *port
+
+    service:
+      sabnzbd:
+        controller: sabnzbd
+        ports:
+          http:
+            port: *port

@@ -3,57 +3,62 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app qui
+  name: qui
 spec:
   chartRef:
     kind: OCIRepository
-    name: *app
+    name: qui
   interval: 1h
   values:
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+
     controllers:
-      *app :
+      qui:
         containers:
-          *app :
+          qui:
             image:
               repository: ghcr.io/autobrr/qui
               tag: v1.30.0@sha256:1172ca40283330445d61189263a65a31ba703770a230b9e2a913f6e57bc2dd23
 
             env:
               QUI__HOST: 0.0.0.0
-              QUI__PORT: &port 80
               QUI__LOG_LEVEL: info
-              QUI__SESSION_SECRET: ${QUI_SESSION_SECRET}
+              QUI__PORT: &port 80
               TZ: America/Boise
+
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
 
             probes:
               liveness:
                 enabled: true
                 spec:
+                  failureThreshold: 5
                   periodSeconds: 30
                   timeoutSeconds: 5
-                  failureThreshold: 5
               readiness:
                 enabled: true
                 custom: true
                 spec:
+                  failureThreshold: 5
                   httpGet:
                     path: /health
                     port: *port
                   periodSeconds: 10
                   timeoutSeconds: 5
-                  failureThreshold: 5
               startup:
                 enabled: true
                 spec:
                   failureThreshold: 30
                   periodSeconds: 10
-
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities:
-                drop:
-                  - "ALL"
 
             resources:
               requests:
@@ -61,61 +66,83 @@ spec:
               limits:
                 memory: 1Gi
 
-    defaultPodOptions:
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
-        fsGroupChangePolicy: OnRootMismatch
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - "ALL"
 
-    service:
-      *app :
-        controller: *app
-        ports:
-          http:
-            port: *port
+              readOnlyRootFilesystem: true
 
-    route:
-      *app :
+    externalSecrets:
+      qui:
         enabled: true
-        annotations:
-          gethomepage.dev/enabled: "true"
-          gethomepage.dev/name: qui
-          gethomepage.dev/group: Downloads
-          gethomepage.dev/description: A fast, modern web interface for qBittorrent. Supports managing multiple qBittorrent instances from a single, lightweight application.
-          gethomepage.dev/icon: https://cdn.jsdelivr.net/gh/selfhst/icons@main/svg/qui-light.svg
-        parentRefs:
-          - name: envoy-internal
-            namespace: networking
-        hostnames:
-          - "{{ .Release.Name }}.idahobealefamily.com"
+        data:
+          - remoteRef:
+              key: QUI_SESSION_SECRET
+
+            secretKey: QUI_SESSION_SECRET
+        refreshInterval: 12h
+        secretStoreRef:
+          kind: ClusterSecretStore
+          name: doppler
+        target:
+          creationPolicy: Owner
+          deletionPolicy: Delete
+          name: qui-secret
+          template:
+            data:
+              QUI__SESSION_SECRET: "{{ .QUI_SESSION_SECRET }}"
+            engineVersion: v2
 
     persistence:
+      backup:
+        type: nfs
+        path: /mnt/storage0/backup
+        server: truenas.internal
+        globalMounts:
+          - path: /backup
+            subPath: "{{ .Release.Name }}"
+
       config:
         existingClaim: "{{ .Release.Name }}"
 
       media:
         type: nfs
-        server: truenas.internal
         path: /mnt/storage1/data
+        server: truenas.internal
         globalMounts:
           - path: /media
-
-      backup:
-        type: nfs
-        server: truenas.internal
-        path: /mnt/storage0/backup
-        globalMounts:
-          - path: /backup
-            subPath: "{{ .Release.Name }}"
 
       tmpfs:
         type: emptyDir
         advancedMounts:
-          *app :
-            *app :
+          qui:
+            qui:
               - path: /config/logs
                 subPath: logs
               - path: /tmp
                 subPath: tmp
+
+    route:
+      qui:
+        enabled: true
+        annotations:
+          gethomepage.dev/description: A fast, modern web interface for qBittorrent. Supports managing multiple qBittorrent instances from a single, lightweight application.
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/group: Downloads
+          gethomepage.dev/icon: https://cdn.jsdelivr.net/gh/selfhst/icons@main/svg/qui-light.svg
+          gethomepage.dev/name: qui
+        hostnames:
+          - "{{ .Release.Name }}.idahobealefamily.com"
+
+        parentRefs:
+          - name: envoy-internal
+            namespace: networking
+
+    service:
+      qui:
+        controller: qui
+        ports:
+          http:
+            port: *port

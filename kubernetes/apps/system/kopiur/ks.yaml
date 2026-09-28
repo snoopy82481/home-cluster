@@ -12,17 +12,12 @@ spec:
       namespace: system
   interval: 1h
   path: ./kubernetes/apps/system/kopiur/app
-  postBuild:
-    substituteFrom:
-      - name: cluster-settings
-        kind: ConfigMap
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
   targetNamespace: system
-  wait: false
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -40,4 +35,3 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: system
-  wait: false

@@ -3,7 +3,7 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &app atuin
+  name: atuin
 spec:
   components:
     - ../../../../components/kopiur/backup
@@ -11,15 +11,11 @@ spec:
   path: ./kubernetes/apps/system/atuin/app
   postBuild:
     substitute:
-      APP: *app
+      APP: atuin
       KOPIUR_CAPACITY: 512Mi
-    substituteFrom:
-      - name: cluster-secrets
-        kind: Secret
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  wait: false
   targetNamespace: system

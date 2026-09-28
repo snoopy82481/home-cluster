@@ -13,15 +13,9 @@ spec:
     substitute:
       APP: qui
       KOPIUR_CAPACITY: 1Gi
-    substituteFrom:
-      - name: cluster-secrets
-        kind: Secret
-      - name: cluster-settings
-        kind: ConfigMap
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
   targetNamespace: downloads
-  wait: false

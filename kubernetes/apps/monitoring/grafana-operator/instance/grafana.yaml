@@ -43,12 +43,12 @@ spec:
                   valueFrom:
                     secretKeyRef:
                       name: grafana-admin-secret
-                      key: admin-password
+                      key: GF_SECURITY_ADMIN_PASSWORD
                 - name: GF_SECURITY_ADMIN_USER
                   valueFrom:
                     secretKeyRef:
                       name: grafana-admin-secret
-                      key: admin-user
+                      key: GF_SECURITY_ADMIN_USER
               securityContext:
                 allowPrivilegeEscalation: false
                 readOnlyRootFilesystem: true

@@ -5,7 +5,7 @@ kind: Kustomization
 namespace: flux-system
 
 components:
-  - ../../components/common
+  - ../../components/alerts
 
 resources:
   - ./flux-instance/ks.yaml

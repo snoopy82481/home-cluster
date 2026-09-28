@@ -3,37 +3,28 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app flaresolverr
+  name: flaresolverr
 spec:
-  interval: 1h
   chartRef:
     kind: OCIRepository
-    name: *app
-  maxHistory: 2
-  test:
-    enable: false
-  install:
-    remediation:
-      retries: 5
-  upgrade:
-    remediation:
-      retries: 5
-      strategy: rollback
-    cleanupOnFail: true
-  rollback:
-    timeout: 10m
-    recreate: true
-    cleanupOnFail: true
-  uninstall:
-    keepHistory: false
+    name: flaresolverr
+  interval: 1h
   values:
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+
     controllers:
-      *app :
+      flaresolverr:
         annotations:
           reloader.stakater.com/auto: "true"
 
         containers:
-          *app :
+          flaresolverr:
             image:
               repository: ghcr.io/flaresolverr/flaresolverr
               tag: v3.5.2@sha256:c80ae007ce2ccdcd217a12426e4f039ef763ff90738c808d38810c3e59323767
@@ -48,17 +39,9 @@ spec:
               limits:
                 memory: 500Mi
 
-    defaultPodOptions:
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
-        fsGroupChangePolicy: OnRootMismatch
-
     service:
-      *app :
-        controller: *app
+      flaresolverr:
+        controller: flaresolverr
         ports:
           http:
             port: 8191

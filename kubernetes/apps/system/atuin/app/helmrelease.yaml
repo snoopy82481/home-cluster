@@ -3,54 +3,55 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app atuin
+  name: atuin
 spec:
   chartRef:
     kind: OCIRepository
-    name: *app
+    name: atuin
   interval: 1h
   values:
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+
     controllers:
-      *app :
+      atuin:
         annotations:
           reloader.stakater.com/auto: "true"
 
         containers:
-          *app :
+          atuin:
             image:
               repository: ghcr.io/atuinsh/atuin
               tag: 18.23.0@sha256:f232feeead54a0a13132b9cd477e312c3380e9dc90f1db24c4f79ce6c8e034ea
 
-            env:
-              TZ: America/Boise
-              ATUIN_HOST: "0.0.0.0"
-              ATUIN_PORT: &port 8888
-              ATUIN_OPEN_REGISTRATION: "true"
-              ATUIN_DB_URI: sqlite:///config/atuin.db
-
             args:
               - start
+
+            env:
+              ATUIN_DB_URI: sqlite:///config/atuin.db
+              ATUIN_HOST: "0.0.0.0"
+              ATUIN_OPEN_REGISTRATION: "true"
+              ATUIN_PORT: &port 8888
+              TZ: America/Boise
 
             probes:
               liveness: &probes
                 enabled: true
                 custom: true
                 spec:
+                  failureThreshold: 3
                   httpGet:
                     path: /healthz
                     port: *port
                   initialDelaySeconds: 0
                   periodSeconds: 10
                   timeoutSeconds: 1
-                  failureThreshold: 3
               readiness: *probes
-
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities:
-                drop:
-                  - "ALL"
 
             resources:
               requests:
@@ -58,35 +59,33 @@ spec:
               limits:
                 memory: 256Mi
 
-    defaultPodOptions:
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
-        fsGroupChangePolicy: OnRootMismatch
-
-    service:
-      *app :
-        controller: *app
-        ports:
-          http:
-            port: *port
-
-    route:
-      *app :
-        enabled: true
-        parentRefs:
-          - name: envoy-internal
-            namespace: networking
-            sectionName: https
-        hostnames:
-          - "{{ .Release.Name }}.idahobealefamily.com"
-        rules:
-          - backendRefs:
-              - identifier: *app
-                port: *port
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - "ALL"
+              readOnlyRootFilesystem: true
 
     persistence:
       config:
         existingClaim: "{{ .Release.Name }}"
+
+    route:
+      atuin:
+        enabled: true
+        hostnames:
+          - "{{ .Release.Name }}.idahobealefamily.com"
+        parentRefs:
+          - name: envoy-internal
+            namespace: networking
+        rules:
+          - backendRefs:
+              - identifier: atuin
+                port: *port
+
+    service:
+      atuin:
+        controller: atuin
+        ports:
+          http:
+            port: *port
