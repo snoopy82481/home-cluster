@@ -24,6 +24,7 @@ jobs:
               "cloudflare/cloudflared",
               "spegel-org/spegel",
               "qbittorrent/qbittorrent",
+              "home-operations/qbittorrent-libtorrentv1",
               "bjw-s-labs/helm-charts",
               "kubernetes/kubernetes",
               "siderolabs/kubelet",
