@@ -1,12 +1,13 @@
 ---
+version: v1alpha1
 machine:
   ca:
-    crt: {{ certs.os.crt }}
+    crt: {{ TALOS.certs.os.crt }}
   features:
     apidCheckExtKeyUsage: true
     diskQuotaSupport: true
     rbac: true
-  token: {{ trustdinfo.token }}
+  token: {{ TALOS.trustdinfo.token }}
   logging:
     destinations:
       - endpoint: udp://127.0.0.1:12345/
@@ -14,7 +15,7 @@ machine:
       - endpoint: tcp://127.0.0.1:5044/
         format: json_lines
 cluster:
-  token: {{ secrets.bootstraptoken }}
+  token: {{ TALOS.secrets.bootstraptoken }}
 ---
 apiVersion: v1alpha1
 kind: BondConfig
@@ -63,8 +64,8 @@ endpoint: https://discovery.talos.dev/
 ---
 apiVersion: v1alpha1
 kind: DiscoveryIdentityConfig
-clusterID: {{ cluster.id }}
-clusterSecret: {{ cluster.secret }}
+clusterID: {{ TALOS.cluster.id }}
+clusterSecret: {{ TALOS.cluster.secret }}
 ---
 apiVersion: v1alpha1
 kind: UnattendedInstallConfig

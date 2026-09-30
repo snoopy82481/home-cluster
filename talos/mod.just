@@ -110,9 +110,6 @@ remove-image:
 update-image version schematic secureboot="true":
     just talos remove-image
     just talos download-image "{{ version }}" "{{ schematic }}" "{{ secureboot }}"
-    # just infra proxmox-init
-    # just infra proxmox-plan
-    # just infra proxmox-apply
 
 [confirm('Reboot node ' + node + ' [y|N] ?')]
 [doc('Reboot a node')]
@@ -124,10 +121,6 @@ reboot-node node:
 reboot-all:
     talosctl reboot -m powercycle -n {{ nodes }}
 
-[private]
-_render-template file *args:
-    just template "{{ file }}" <(sops exec-file --filename talsecret.yaml --input-type yaml --output-type yaml "{{ source_directory() }}/talsecret.sops.yaml" "yq '.certs_pem = (.certs | with_entries(.value |= with_entries(.value |= @base64d))) | .sa_pem = (.serviceaccount | with_entries(.value |= @base64d))' {}") -f yaml {{ args }}
-
 [doc('Render Talos config for a node')]
 render-config node:
     schematic="$(just talos schematic-id "{{ node }}")"
@@ -137,14 +130,14 @@ render-config node:
       role="worker"
     fi
 
-    talosctl machineconfig patch <(just talos _render-template "{{ source_directory() }}/cluster.yaml.j2" -D "schematic=${schematic}") \
-      -p @<(just talos _render-template "{{ source_directory() }}/${role}.yaml.j2") \
+    talosctl machineconfig patch <(just template "{{ source_directory() }}/cluster.yaml.j2" -D "schematic=${schematic}") \
+      -p @<(just template "{{ source_directory() }}/${role}.yaml.j2") \
       -p @<(just template "{{ source_directory() }}/nodes/${role}/{{ node }}.yaml.j2")
 
 [confirm('Reset node ' + node + ' [y|N] ?')]
 [doc('Reset a node')]
-reset-node node:
-    talosctl -n "{{ node }}" reset --reboot --system-labels-to-wipe STATE --system-labels-to-wipe EPHEMERAL --graceful=false --wait=false
+reset-node node *args:
+    talosctl -n "{{ node }}" reset --system-labels-to-wipe STATE --system-labels-to-wipe EPHEMERAL --system-labels-to-wipe u-local-hostpath --graceful=false {{ args }}
 
 [confirm('Shutdown node ' + node + ' [y|N] ?')]
 [doc('Shutdown a node')]
@@ -171,7 +164,6 @@ upgrade-node node *args:
 upgrade-all version=talos_version:
     for node in nodes.split(','); do
       just talos upgrade-node "${node}"
-      # talosctl -n "${node}" upgrade -i "$(just talos machine-image ${node})" -m powercycle --timeout=10m
     done
 
 [private]
@@ -190,10 +182,5 @@ schematic-id node="":
 
 [doc('Get the machine image for a given node')]
 [private]
-machine-role node:
-    just template "{{ source_directory() }}/nodes/{{ node }}.yaml.j2" | yq -er 'select(.machine) | .machine.type'
-
-[doc('Get the machine image for a given node')]
-[private]
 machine-image node:
-    just talos _render-template talos/cluster.yaml.j2 '-D schematic=$(just talos schematic-id "{{ node }}")' | yq -r -e 'select(.kind == "UnattendedInstallConfig") | .installer.image'
+    just template "{{ source_directory() }}/cluster.yaml.j2" -D "schematic=$(just talos schematic-id "{{ node }}")" | yq -r -e 'select(.kind == "UnattendedInstallConfig") | .installer.image'

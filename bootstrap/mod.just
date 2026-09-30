@@ -38,40 +38,19 @@ k8s:
 [private]
 kubeconfig lb="cilium":
     just log info "Running stage..." "stage" "{{ recipe_name() }}"
-    kubeconfig="{{ justfile_dir() }}/kubeconfig"
-
     if ! talosctl kubeconfig -n "{{ controller }}" -f --force-context-name main {{ justfile_dir() }}; then
         just log fatal "Failed to fetch kubeconfig" "stage" "{{ recipe_name() }}"
     fi
-
-    # Talos names the cluster after the Talos cluster name (for example, "betty"),
-    # while --force-context-name only renames the context. Keep a single, consistent
-    # bootstrap context and preserve the generated CA and client credentials.
-    tmp_kubeconfig="$(mktemp "${kubeconfig}.XXXXXX")"
-    trap 'rm -f "${tmp_kubeconfig}"' EXIT
-    if ! kubectl --kubeconfig "${kubeconfig}" config view --raw --minify --flatten -o yaml \
-        | yq '.clusters[0].name = "main" | .contexts[0].name = "main" | .contexts[0].context.cluster = "main" | ."current-context" = "main"' \
-        > "${tmp_kubeconfig}"; then
-        just log fatal "Failed to normalize kubeconfig context" "stage" "{{ recipe_name() }}"
-    fi
-    mv "${tmp_kubeconfig}" "${kubeconfig}"
-
     if [[ "{{ lb }}" != "cilium" ]]; then
-        if ! kubectl --kubeconfig "${kubeconfig}" config set-cluster main --server "https://{{ controller }}:6443"; then
+        if ! kubectl config set-cluster main --server "https://{{ controller }}:6443"; then
             just log fatal "Failed to set kubectl cluster server address" "stage" "{{ recipe_name() }}"
         fi
     fi
 
 [private]
-base: api-ready nodes-ready apply-secrets
+base: api-ready nodes-ready
     just log info "Running stage..." "stage" "{{ recipe_name() }}"
-    if ! {
-        kustomize build {{ source_directory() }}/kustomize/personal | yq 'select(has("sops") | not)'
-        while IFS= read -r secret; do
-            printf '%s\n' '---'
-            just template "$secret"
-        done < <(rg --files -g '*.sops.*' "{{ source_directory() }}/kustomize/personal")
-    } | just template - | kubectl apply --server-side --force-conflicts -f -; then
+    if ! kustomize build bootstrap/kustomize/personal | just template - | yq 'with(select(.kind == "Secret" and (.stringData | tag) == "!!str"); .stringData |= from_json)' | kubectl apply --server-side --force-conflicts -f -; then
         just log fatal "Failed to apply personal manifests" "stage" "{{ recipe_name() }}"
     fi
     if ! helmfile -f "{{ source_directory() }}/helmfile.d/crds.yaml" template -q | yq ea -e 'select(.kind == "CustomResourceDefinition")' | kubectl apply --server-side --force-conflicts -f -; then

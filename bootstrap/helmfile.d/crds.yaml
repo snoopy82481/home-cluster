@@ -22,6 +22,9 @@ releases:
   - name: grafana-operator
     namespace: monitoring
 
+  - name: kopiur
+    namespace: system
+
   - name: kube-prometheus-stack
     namespace: monitoring
 

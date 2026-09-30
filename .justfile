@@ -29,14 +29,11 @@ default:
 log lvl msg *args:
     gum log -t rfc3339 -s -l "{{ lvl }}" "{{ msg }}" {{ args }}
 
+# Render a Jinja template with Doppler secrets as its context.
+[positional-arguments]
 [private]
-template file *args:
-    if [[ "{{ file }}" == "-" ]]; then
-        minijinja-cli --config-file .minijinja.toml - {{ args }}
-    else
-        if grep -qE '^sops:[[:space:]]*(#.*)?$' "{{ file }}"; then
-            sops decrypt --input-type yaml --output-type yaml "{{ file }}"
-        else
-            cat "{{ file }}"
-        fi | minijinja-cli --config-file .minijinja.toml - {{ args }}
-    fi
+template file='-' *args:
+    file="$1"
+    shift
+    doppler_context="$(doppler secrets download --project home-cluster --config prd_kubernetes --format json --no-file --no-fallback --no-check-version </dev/null | jq 'map_values(. as $value | try (fromjson | if type == "object" or type == "array" then . else $value end) catch $value)')"
+    minijinja-cli --config-file .minijinja.toml --format json "$file" <(printf '%s\n' "$doppler_context") "$@"

@@ -15,4 +15,4 @@ apiVersion: v1alpha1
 kind: KubeAPIServerCAConfig
 acceptedCAs:
   - |
-{{ certs_pem.k8s.crt | indent(width=6, first=true) }}
+{{ TALOS.certs.k8s.crt | indent(width=6, first=true) }}

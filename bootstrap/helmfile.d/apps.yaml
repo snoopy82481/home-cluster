@@ -63,7 +63,7 @@ releases:
   - name: flux-operator
     namespace: flux-system
     needs:
-      - cert-manager/cert-manager
+      - external-secrets/external-secrets
 
   - name: flux-instance
     namespace: flux-system
