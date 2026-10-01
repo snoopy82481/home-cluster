@@ -164,7 +164,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run oxfmt
-        uses: oxc-project/oxfmt-action@f3c7e0d6a1b9f5c8e4b2d1e5f6a7b8c9d0e1f2a3 # v1.0.0
+        uses: oxc-project/oxfmt-action@v0.1.0
         # env:
         #   OXFMT_FILE: ${{ matrix.oxfmt }}
         # run: |
