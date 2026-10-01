@@ -89,6 +89,53 @@ checksum = "sha256:869bc322c880db7c566995f8e251dd3270e15814f26e4c7c8c13922319a93
 url = "https://github.com/cilium/cilium-cli/releases/download/v0.20.1/cilium-windows-amd64.zip"
 url_api = "https://api.github.com/repos/cilium/cilium-cli/releases/assets/585358777"
 
+[[tools.doppler]]
+version = "3.76.6"
+backend = "github:DopplerHQ/cli"
+specifiers = ["3.76.6"]
+
+[tools.doppler."platforms.linux-arm64"]
+checksum = "sha256:621456ac08436c4037a72c8641e4bdcccd0e404ab43b79a61d449445bb02e6e5"
+url = "https://github.com/DopplerHQ/cli/releases/download/3.76.6/doppler_3.76.6_linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/DopplerHQ/cli/releases/assets/580040602"
+provenance = "github-attestations"
+
+[tools.doppler."platforms.linux-arm64-musl"]
+checksum = "sha256:621456ac08436c4037a72c8641e4bdcccd0e404ab43b79a61d449445bb02e6e5"
+url = "https://github.com/DopplerHQ/cli/releases/download/3.76.6/doppler_3.76.6_linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/DopplerHQ/cli/releases/assets/580040602"
+provenance = "github-attestations"
+
+[tools.doppler."platforms.linux-x64"]
+checksum = "sha256:67e4e020761adf3ffe5a030712d61721b4e2752182670bf90de5a2a88e4961e3"
+url = "https://github.com/DopplerHQ/cli/releases/download/3.76.6/doppler_3.76.6_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/DopplerHQ/cli/releases/assets/580040608"
+provenance = "github-attestations"
+
+[tools.doppler."platforms.linux-x64-musl"]
+checksum = "sha256:67e4e020761adf3ffe5a030712d61721b4e2752182670bf90de5a2a88e4961e3"
+url = "https://github.com/DopplerHQ/cli/releases/download/3.76.6/doppler_3.76.6_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/DopplerHQ/cli/releases/assets/580040608"
+provenance = "github-attestations"
+
+[tools.doppler."platforms.macos-arm64"]
+checksum = "sha256:0023854e5e19a871234b9b705287483265eb65a64c0560b3eaafa7143ecc4e4b"
+url = "https://github.com/DopplerHQ/cli/releases/download/3.76.6/doppler_3.76.6_macOS_arm64.tar.gz"
+url_api = "https://api.github.com/repos/DopplerHQ/cli/releases/assets/580040607"
+provenance = "github-attestations"
+
+[tools.doppler."platforms.macos-x64"]
+checksum = "sha256:b8edd464489d51b3856281e9aba0ac5ea36d364272cd143138b1efa5ea568042"
+url = "https://github.com/DopplerHQ/cli/releases/download/3.76.6/doppler_3.76.6_macOS_amd64.tar.gz"
+url_api = "https://api.github.com/repos/DopplerHQ/cli/releases/assets/580040609"
+provenance = "github-attestations"
+
+[tools.doppler."platforms.windows-x64"]
+checksum = "sha256:fe6157c7294b859335116aa2f8d96a9f149d66ec0307bee02b273e30107e9a3f"
+url = "https://github.com/DopplerHQ/cli/releases/download/3.76.6/doppler_3.76.6_windows_amd64.zip"
+url_api = "https://api.github.com/repos/DopplerHQ/cli/releases/assets/580040617"
+provenance = "github-attestations"
+
 [[tools."github:home-operations/flate"]]
 version = "0.6.5"
 backend = "github:home-operations/flate"
@@ -338,7 +385,7 @@ url = "https://nodejs.org/dist/v26.10.0/node-v26.10.0-win-x64.zip"
 
 [[tools.oxfmt]]
 version = "0.71.0"
-aube = { path = "locks/oxfmt/0.71.0", digest = "sha256:2b7bfb8c20b448ab9b5549e2e0a43049a897d50d995103408bbba2b0add2bcf0" }
+aube = { path = "locks/oxfmt/0.71.0", digest = "sha256:98e4ad5fda0b7ae3ae05abd1809e4764bc290c131db8df6fe4f66d9f0252f913" }
 backend = "npm:oxfmt"
 specifiers = ["0.71.0"]
 
