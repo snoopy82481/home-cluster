@@ -74,7 +74,6 @@ spec:
       security:
         cephx:
           allowedCiphers:
-            - aes
             - aes256k
           daemon:
             keyRotationPolicy: KeyGeneration
