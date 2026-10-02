@@ -1,11 +1,11 @@
-data "sops_file" "proxmox_secrets" {
-  source_file = "secret.sops.yaml"
-}
+provider "doppler" {}
+
+data "doppler_secrets" "home-cluster" {}
 
 provider "proxmox" {
   pm_api_url          = "https://192.168.0.3:8006/api2/json"
-  pm_api_token_id     = data.sops_file.proxmox_secrets.data["token_id"]
-  pm_api_token_secret = data.sops_file.proxmox_secrets.data["token_secret"]
+  pm_api_token_id     = local.proxmox_secrets.token_id
+  pm_api_token_secret = local.proxmox_secrets.token_secret
   pm_tls_insecure     = true
 }
 

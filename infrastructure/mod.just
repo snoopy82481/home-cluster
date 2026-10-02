@@ -13,7 +13,7 @@ default:
 
 [private]
 _proxmox_tofu command *args:
-    cd {{ opentofu_vm_dir }} && tofu {{ command }} {{ args }}
+    cd {{ opentofu_vm_dir }} && doppler run -- tofu {{ command }} {{ args }}
 
 [doc('Initialize proxmox OpenTofu dependencies')]
 proxmox-init *args:

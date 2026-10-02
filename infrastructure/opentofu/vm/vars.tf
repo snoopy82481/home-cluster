@@ -43,6 +43,10 @@ variable "worker_mac" {
 }
 
 locals {
+  proxmox_secrets = jsondecode(data.doppler_secrets.home-cluster.map.PROXMOX)
+}
+
+locals {
   talos_images = yamldecode(
     file("${path.module}/../../../talos/talenv.yaml")
   ).talosImages

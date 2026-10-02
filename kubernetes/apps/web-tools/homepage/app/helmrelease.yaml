@@ -80,8 +80,8 @@ spec:
               key: SABNZBD
           - extract:
               key: COMMON
-          - find:
-              path: PROXMOX_TOKEN_
+          - extract:
+              key: PROXMOX
           - extract:
               key: RADARR
           - extract:
@@ -108,8 +108,8 @@ spec:
               HOMEPAGE_VAR_OMADA_ADMIN_USER: "{{ .ADMIN_USER }}"
               HOMEPAGE_VAR_PFSENSE_API_KEY: "{{ .PFSENSE_API_KEY }}"
               HOMEPAGE_VAR_PROWLARR_APIKEY: "{{ .PROWLARR_APIKEY }}"
-              HOMEPAGE_VAR_PROXMOX_TOKEN_ID: "{{ .PROXMOX_TOKEN_ID }}"
-              HOMEPAGE_VAR_PROXMOX_TOKEN_SECRET: "{{ .PROXMOX_TOKEN_SECRET }}"
+              HOMEPAGE_VAR_PROXMOX_TOKEN_ID: "{{ .homepage_token_id }}"
+              HOMEPAGE_VAR_PROXMOX_TOKEN_SECRET: "{{ .homepage_token_secret }}"
               HOMEPAGE_VAR_RADARR_ANIME_APIKEY: "{{ .RADARR_ANIME_APIKEY }}"
               HOMEPAGE_VAR_RADARR_APIKEY: "{{ .RADARR_APIKEY }}"
               HOMEPAGE_VAR_RADARR_UHD_APIKEY: "{{ .RADARR_UHD_APIKEY }}"

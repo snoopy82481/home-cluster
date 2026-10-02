@@ -57,19 +57,6 @@ spec:
         ssl: false
         prometheusEndpoint: http://prometheus-operated.monitoring.svc.cluster.local:9090
 
-      healthCheck:
-        muteHealthWarning:
-          AUTH_INSECURE_ROTATING_SERVICE_KEY_TYPE:
-            policy: mute
-          AUTH_INSECURE_CLIENT_KEY_TYPE:
-            policy: mute
-          AUTH_INSECURE_KEYS_ALLOWED:
-            policy: mute
-          AUTH_INSECURE_SERVICE_KEY_TYPE:
-            policy: mute
-          AUTH_INSECURE_KEYS_CREATABLE:
-            policy: mute
-
       mgr:
         modules:
           - name: pg_autoscaler
@@ -92,7 +79,6 @@ spec:
           daemon:
             keyRotationPolicy: KeyGeneration
             keyGeneration: 2
-            keyType: aes
           csi:
             keyRotationPolicy: KeyGeneration
             keyGeneration: 2
