@@ -50,7 +50,7 @@ kubeconfig lb="cilium":
 [private]
 base: api-ready nodes-ready
     just log info "Running stage..." "stage" "{{ recipe_name() }}"
-    if ! kustomize build bootstrap/kustomize/personal | just template - | yq 'with(select(.kind == "Secret" and (.stringData | tag) == "!!str"); .stringData |= from_json)' | kubectl apply --server-side --force-conflicts -f -; then
+    if ! kustomize build {{ source_directory() }}/kustomize/personal | just template - | yq 'with(select(.kind == "Secret" and (.stringData | tag) == "!!str"); .stringData |= from_json)' | kubectl apply --server-side --force-conflicts -f -; then
         just log fatal "Failed to apply personal manifests" "stage" "{{ recipe_name() }}"
     fi
     if ! helmfile -f "{{ source_directory() }}/helmfile.d/crds.yaml" template -q | yq ea -e 'select(.kind == "CustomResourceDefinition")' | kubectl apply --server-side --force-conflicts -f -; then
