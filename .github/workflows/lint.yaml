@@ -163,12 +163,18 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
+      - name: Setup Mise
+        uses: jdx/mise-action@9149ea85001c7435d5a66bb127d6a1b6227cb0a5 # v5.0.0
+        with:
+          cache: false
+          tool_versions: |
+            oxfmt latest
+
       - name: Run oxfmt
-        uses: oxc-project/oxfmt-action@v0.1.0
-        # env:
-        #   OXFMT_FILE: ${{ matrix.oxfmt }}
-        # run: |
-        #   npx --yes oxfmt@0.64.0 --check --no-error-on-unmatched-pattern "$OXFMT_FILE"
+        env:
+          OXFMT_FILE: ${{ matrix.oxfmt }}
+        run: |
+          oxfmt --check --no-error-on-unmatched-pattern "$OXFMT_FILE"
 
   lint_success:
     needs:

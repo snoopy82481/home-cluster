@@ -14,7 +14,6 @@ spec:
       securityContext:
         fsGroup: 1000
         fsGroupChangePolicy: OnRootMismatch
-
         runAsGroup: 1000
         runAsNonRoot: true
         runAsUser: 1000
@@ -28,9 +27,14 @@ spec:
               tag: v1.30.0@sha256:1172ca40283330445d61189263a65a31ba703770a230b9e2a913f6e57bc2dd23
 
             env:
+              QUI__AUTH_DISABLED: true
+              QUI__I_ACKNOWLEDGE_THIS_IS_A_BAD_IDEA: true
+              QUI__AUTH_DISABLED_ALLOWED_CIDRS: 0.0.0.0/0
               QUI__HOST: 0.0.0.0
-              QUI__LOG_LEVEL: info
               QUI__PORT: &port 80
+              QUI__METRICS_ENABLED: true
+              QUI__METRICS_HOST: 0.0.0.0
+              QUI__METRICS_PORT: &metricsPort 8080
               TZ: America/Boise
 
             envFrom:
@@ -71,7 +75,6 @@ spec:
               capabilities:
                 drop:
                   - "ALL"
-
               readOnlyRootFilesystem: true
 
     externalSecrets:
@@ -80,7 +83,6 @@ spec:
         data:
           - remoteRef:
               key: QUI_SESSION_SECRET
-
             secretKey: QUI_SESSION_SECRET
         refreshInterval: 12h
         secretStoreRef:
@@ -96,14 +98,6 @@ spec:
             engineVersion: v2
 
     persistence:
-      backup:
-        type: nfs
-        path: /mnt/storage0/backup
-        server: truenas.internal
-        globalMounts:
-          - path: /backup
-            subPath: "{{ .Release.Name }}"
-
       config:
         existingClaim: "{{ .Release.Name }}"
 
@@ -142,7 +136,13 @@ spec:
 
     service:
       qui:
-        controller: qui
         ports:
           http:
             port: *port
+          metrics:
+            port: *metricsPort
+
+    serviceMonitor:
+      qui:
+        endpoints:
+          - port: metrics
