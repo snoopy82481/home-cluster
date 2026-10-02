@@ -40,6 +40,10 @@ spec:
     route:
       echo-server:
         enabled: true
+        annotations:
+          gatus.home-operations.com/endpoint: |-
+            conditions: ["[STATUS] == 200"]
+            path: /healthz
         hostnames:
           - "{{ .Release.Name }}.idahobealefamily.com"
         parentRefs:

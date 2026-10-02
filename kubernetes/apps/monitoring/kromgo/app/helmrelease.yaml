@@ -78,6 +78,9 @@ spec:
           colorExpr: 'colorScale(result, [1.0], ["green", "red"])'
     httpRoute:
       enabled: true
+      annotations:
+        gatus.home-operations.com/endpoint: |-
+          conditions: ["[STATUS] == 200"]
       parentRefs:
         - name: envoy-external
           namespace: networking

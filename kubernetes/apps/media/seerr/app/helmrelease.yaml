@@ -86,9 +86,12 @@ spec:
     route:
       seerr:
         enabled: true
+        annotations:
+          gatus.home-operations.com/endpoint: |-
+            conditions: ["[STATUS] == 200"]
+            path: /api/v1/status
         hostnames:
           - "{{ .Release.Name }}.idahobealefamily.com"
-
         parentRefs:
           - name: envoy-external
             namespace: networking
