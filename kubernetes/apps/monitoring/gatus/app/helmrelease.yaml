@@ -102,7 +102,7 @@ spec:
 
       config-file:
         type: configMap
-        name: gatus-config
+        name: gatus-configmap
         globalMounts:
           - path: /config/config.yaml
             readOnly: true
