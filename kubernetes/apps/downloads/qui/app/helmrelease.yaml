@@ -10,13 +10,13 @@ spec:
     name: qui
   interval: 1h
   values:
-    defaultPodOptions:
-      securityContext:
-        fsGroup: 1000
-        fsGroupChangePolicy: OnRootMismatch
-        runAsGroup: 1000
-        runAsNonRoot: true
-        runAsUser: 1000
+    # defaultPodOptions:
+    #   securityContext:
+    #     fsGroup: 1000
+    #     fsGroupChangePolicy: OnRootMismatch
+    #     runAsGroup: 1000
+    #     runAsNonRoot: true
+    #     runAsUser: 1000
 
     controllers:
       qui:
@@ -108,16 +108,6 @@ spec:
         globalMounts:
           - path: /media
 
-      tmpfs:
-        type: emptyDir
-        advancedMounts:
-          qui:
-            qui:
-              - path: /config/logs
-                subPath: logs
-              - path: /tmp
-                subPath: tmp
-
     route:
       qui:
         enabled: true
@@ -129,7 +119,6 @@ spec:
           gethomepage.dev/name: qui
         hostnames:
           - "{{ .Release.Name }}.idahobealefamily.com"
-
         parentRefs:
           - name: envoy-internal
             namespace: networking
