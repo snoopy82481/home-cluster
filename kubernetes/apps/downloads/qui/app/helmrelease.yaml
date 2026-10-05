@@ -20,6 +20,9 @@ spec:
 
     controllers:
       qui:
+        annotations:
+          reloader.stakater.com/auto: "true"
+
         containers:
           qui:
             image:
@@ -76,6 +79,14 @@ spec:
                 drop:
                   - "ALL"
               readOnlyRootFilesystem: true
+
+        pod:
+          securityContext:
+            fsGroup: 1000
+            fsGroupChangePolicy: "OnRootMismatch"
+            runAsGroup: 1000
+            runAsNonRoot: true
+            runAsUser: 1000
 
     externalSecrets:
       qui:
