@@ -138,7 +138,7 @@ spec:
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:
-  name: zfs
+  name: pfsense
 spec:
   allowCrossNamespaceImport: true
   instanceSelector:
@@ -147,4 +147,4 @@ spec:
   datasources:
     - datasourceName: prometheus
       inputName: DS_PROMETHEUS
-  url: https://grafana.com/api/dashboards/24987/revisions/8/download
+  url: https://grafana.com/api/dashboards/25535/revisions/1/download

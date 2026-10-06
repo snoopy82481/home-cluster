@@ -3,14 +3,14 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app victoria-logs-collector
+  name: victoria-logs-collector
 spec:
   interval: 30m
   chartRef:
     kind: OCIRepository
-    name: *app
+    name: victoria-logs-collector
   values:
-    fullnameOverride: *app
+    fullnameOverride: victoria-logs-collector
     global:
       image:
         registry: quay.io
