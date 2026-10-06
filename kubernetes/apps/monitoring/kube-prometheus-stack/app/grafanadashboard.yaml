@@ -147,4 +147,6 @@ spec:
   datasources:
     - datasourceName: prometheus
       inputName: DS_PROMETHEUS
-  url: https://grafana.com/api/dashboards/25535/revisions/1/download
+  configMapRef:
+    name: pfsense-dashboard
+    key: pfsense-dashboard.json

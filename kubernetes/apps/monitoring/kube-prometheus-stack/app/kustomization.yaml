@@ -12,6 +12,9 @@ configMapGenerator:
   - name: flux-metrics-configmap
     files:
       - flux-metrics.yaml=./resources/flux-metrics.yaml
+  - name: pfsense-dashboard
+    files:
+      - pfsense-dashboard.json=./resources/pfsense-dashboard.json
 
 generatorOptions:
   disableNameSuffixHash: true
