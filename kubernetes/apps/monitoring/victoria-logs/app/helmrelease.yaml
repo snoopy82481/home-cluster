@@ -27,7 +27,6 @@ spec:
       route:
         enabled: true
         annotations:
-          lbipam.cilium.io/ips: 192.168.20.54
           gethomepage.dev/enabled: "true"
           gethomepage.dev/name: victoria-logs
           gethomepage.dev/group: Monitoring
@@ -39,5 +38,19 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: networking
+      service:
+        annotations:
+          lbipam.cilium.io/ips: 192.168.20.54
+        externalTrafficPolicy: Cluster
+        type: LoadBalancer
       serviceMonitor:
         enabled: true
+      syslog:
+        udp:
+          - name: syslog-udp
+            value: :1514
+            streamFields: '["hostname","app_name"]'
+        tcp:
+          - name: syslog-tcp
+            value: :1514
+            streamFields: '["hostname","app_name"]'
