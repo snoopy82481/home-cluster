@@ -11,6 +11,12 @@ spec:
     name: rook-ceph
   interval: 1h
   values:
+    # Set due to host processor not able to support AVX2 instructions, which are required by the default Ceph build.
+    csi:
+      cephcsi:
+        repository: quay.io/cephcsi/cephcsi
+        tag: v3.17.1
+
     image:
       repository: ghcr.io/rook/ceph
 
