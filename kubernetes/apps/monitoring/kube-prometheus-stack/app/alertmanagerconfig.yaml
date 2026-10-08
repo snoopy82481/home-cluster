@@ -55,5 +55,5 @@ spec:
             {{ end }}
           sendResolved: true
           apiURL:
-            name: cluster-secrets
+            name: alertmanager-secret
             key: DISCORD_WEBHOOK_URL
