@@ -10,64 +10,104 @@ spec:
     name: kyverno
   interval: 1h
   values:
-    crds:
-      install: true
+    features:
+      mutatingAdmissionPolicies:
+        enabled: false
+      # Reports are for config monitoring, not enforcement — trim their etcd
+      # write churn. Drop transient admission (ephemeral) reports, only record
+      # validate-rule results (not mutate/generate), and re-scan daily.
+      admissionReports:
+        enabled: false
+      reporting:
+        validate: true
+        mutate: false
+        mutateExisting: false
+        generate: false
+        imageVerify: false
+      backgroundScan:
+        backgroundScanInterval: 24h
 
     grafana:
       enabled: true
-      annotations:
-        grafana_folder: System
 
     admissionController:
+      # HA: keep >1 admission replica so a single pod disruption (e.g. a tuppr
+      # node drain) never empties kyverno-svc endpoints. With failurePolicy=Fail
+      # webhooks, zero endpoints rejects cluster-wide writes and bricks the
+      # control plane (KCM/scheduler crashloop). antiAffinity is on by default,
+      # so replicas spread across nodes.
       replicas: 3
+      podDisruptionBudget:
+        # Explicit PDB (chart auto-enables one when replicas>1, but make it
+        # declarative) so node drains can never evict all admission pods at once.
+        enabled: true
+        minAvailable: 1
+      clusterRole:
+        extraResources:
+          - apiGroups:
+              - "*"
+            resources:
+              - "*"
+            verbs:
+              - get
+              - list
+              - watch
+      container:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            memory: 512Mi
       serviceMonitor:
         enabled: true
-      rbac:
-        clusterRole:
-          extraResources:
-            - apiGroups:
-                - ""
-              resources:
-                - pods
-              verbs:
-                - create
-                - update
-                - delete
-
-      topologySpreadConstraints:
-        - maxSkew: 1
-          topologyKey: kubernetes.io/hostname
-          whenUnsatisfiable: DoNotSchedule
-          labelSelector:
-            matchLabels:
-              app.kubernetes.io/instance: kyverno
-              app.kubernetes.io/component: kyverno
 
     backgroundController:
-      replicas: 2
-      serviceMonitor:
-        enabled: true
-      rbac:
-        clusterRole:
-          extraResources:
-            - apiGroups:
-                - ""
-              resources:
-                - pods
-              verbs:
-                - create
-                - update
-                - patch
-                - delete
-                - get
-                - list
-
-    cleanupController:
-      replicas: 2
+      clusterRole:
+        extraResources:
+          - apiGroups:
+              - "*"
+            resources:
+              - "*"
+            verbs:
+              - get
+              - list
+              - watch
+      resources:
+        requests:
+          cpu: 50m
+          memory: 128Mi
+        limits:
+          memory: 384Mi
       serviceMonitor:
         enabled: true
 
     reportsController:
-      replicas: 2
+      clusterRole:
+        extraResources:
+          - apiGroups:
+              - "*"
+            resources:
+              - "*"
+            verbs:
+              - get
+              - list
+              - watch
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          memory: 384Mi
+      serviceMonitor:
+        enabled: true
+
+    cleanupController:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          memory: 384Mi
       serviceMonitor:
         enabled: true

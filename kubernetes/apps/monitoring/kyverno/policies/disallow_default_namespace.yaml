@@ -1,45 +1,50 @@
 ---
-# yaml-language-server: $schema=https://crd.movishell.pl/kyverno.io/clusterpolicy_v1.json
-apiVersion: kyverno.io/v1
-kind: ClusterPolicy
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/policies.kyverno.io/validatingpolicy_v1.json
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
 metadata:
   name: disallow-default-namespace
   annotations:
-    pod-policies.kyverno.io/autogen-controllers: none
-    policies.kyverno.io/title: Disallow Default Namespace
-    policies.kyverno.io/category: Multi-Tenancy
+    policies.kyverno.io/title: Disallow Default Namespace in VPOL
+    policies.kyverno.io/minversion: 1.17.0
+    policies.kyverno.io/category: Multi-Tenancy in VPOL
+    kyverno.io/kubernetes-version: "1.30"
     policies.kyverno.io/severity: medium
     policies.kyverno.io/subject: Pod
     policies.kyverno.io/description: >-
       Kubernetes Namespaces are an optional feature that provide a way to segment and
       isolate cluster resources across multiple applications and users. As a best
       practice, workloads should be isolated with Namespaces. Namespaces should be required
-      and the default (empty) Namespace should not be used. This policy validates that Pods
-      specify a Namespace name other than `default`.
+      and the default Namespace should not be used. This policy rejects Pods and
+      explicitly matched workload controllers in the default Namespace, using the
+      resource's Namespace rather than its Pod template metadata.
 spec:
-  validationFailureAction: enforce
-  background: true
-  rules:
-    - name: validate-namespace
-      match:
+  autogen:
+    validatingAdmissionPolicy:
+      enabled: true
+  evaluation:
+    background:
+      enabled: true
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - ""
+          - "apps"
+          - "batch"
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
         resources:
-          kinds:
-            - Pod
-      validate:
-        message: "Using 'default' namespace is not allowed."
-        pattern:
-          metadata:
-            namespace: "!default"
-    - name: validate-podcontroller-namespace
-      match:
-        resources:
-          kinds:
-            - DaemonSet
-            - Deployment
-            - Job
-            - StatefulSet
-      validate:
-        message: "Using 'default' namespace is not allowed for pod controllers."
-        pattern:
-          metadata:
-            namespace: "!default"
+          - cronjobs
+          - daemonsets
+          - deployments
+          - jobs
+          - pods
+          - statefulsets
+  validationActions:
+    - Deny
+  validations:
+    - expression: object.metadata.namespace != 'default'
+      message: Using 'default' namespace is not allowed.

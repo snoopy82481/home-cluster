@@ -107,7 +107,7 @@ remove-image:
     done
 
 [doc('Update Talos machine image from version + schematic (remove old images, then download new one)')]
-update-image version schematic secureboot="true":
+update-image schematic version=talos_version secureboot="true":
     just talos remove-image
     just talos download-image "{{ version }}" "{{ schematic }}" "{{ secureboot }}"
 

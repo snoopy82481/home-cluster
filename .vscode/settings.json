@@ -59,6 +59,7 @@
     "alertmanager",
     "grafana",
     "kyverno",
+    "kyverno-policies",
     "cert-manager",
     "external-dns",
     "k8s-gateway",
@@ -66,20 +67,13 @@
     "rook-ceph",
     "qbittorrent",
     "bazarr",
-    "bazarr-anime",
-    "bazarr-uhd",
-    "overseer",
+    "seer",
     "prowlarr",
-    "readarr",
     "radarr",
-    "radarr-uhd",
-    "radarranime",
     "recyclarr",
     "sabnzbd",
     "node-problem",
     "sonarr",
-    "sonarranime",
-    "sonarruhd",
     "tautulli",
     "cloudflared",
     "kube-prometheus-stack",
@@ -88,8 +82,7 @@
     "victoria-logs",
     "just",
     "qui",
-    "atuin",
-    "kavita"
+    "atuin"
   ],
   "files.associations": {
     "**/*.json5": "json5",
@@ -139,21 +132,10 @@
     "vs-kubernetes.knownKubeconfigs": ["./kubeconfig"],
     "vs-kubernetes.kubeconfig": "./kubeconfig"
   },
-  "yaml.schemas": {
-    "https://raw.githubusercontent.com/recyclarr/recyclarr/master/schemas/config-schema.json": "./kubernetes/apps/media/recyclarr/app/configs/*.yaml",
-    "https://raw.githubusercontent.com/recyclarr/recyclarr/master/schemas/settings-schema.json": "./kubernetes/apps/media/recyclarr/settings.yaml",
-    "Kubernetes": "./kubernetes/*.yaml"
-  },
   "yaml.schemaStore.enable": true,
   "[json][json5][jsonc]": {
     "editor.defaultFormatter": "oxc.oxc-vscode"
   },
-  // "[json]": {
-  //   "editor.defaultFormatter": "oxc.oxc-vscode"
-  // },
-  // "[jsonc]": {
-  //   "editor.defaultFormatter": "oxc.oxc-vscode"
-  // },
   "[just]": {
     "editor.defaultFormatter": "nefrob.vscode-just-syntax"
   },

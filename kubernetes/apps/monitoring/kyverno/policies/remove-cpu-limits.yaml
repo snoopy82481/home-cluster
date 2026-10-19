@@ -1,7 +1,7 @@
 ---
-# yaml-language-server: $schema=https://crd.movishell.pl/kyverno.io/clusterpolicy_v1.json
-apiVersion: kyverno.io/v1
-kind: ClusterPolicy
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/policies.kyverno.io/mutatingpolicy_v1.json
+apiVersion: policies.kyverno.io/v1
+kind: MutatingPolicy
 metadata:
   name: remove-cpu-limit
   annotations:
@@ -11,39 +11,76 @@ metadata:
     policies.kyverno.io/subject: Pod
     policies.kyverno.io/description: >-
       This policy removes CPU limits from all Pods.
-    pod-policies.kyverno.io/autogen-controllers: none
 spec:
-  rules:
-    - name: remove-containers-cpu-limits
-      match:
-        any:
-          - resources:
-              kinds:
-                - Pod
-
-      mutate:
-        foreach:
-          - list: request.object.spec.containers
-            patchesJson6902: |-
-              - path: /spec/containers/{{elementIndex}}/resources/limits/cpu
-                op: remove
-
-    - name: delete-initcontainers-cpu-limits
-      match:
-        any:
-          - resources:
-              kinds:
-                - Pod
-
-      preconditions:
-        all:
-          - key: "{{ request.object.spec.initContainers[] || `[]` | length(@) }}"
-            operator: GreaterThanOrEquals
-            value: 1
-
-      mutate:
-        foreach:
-          - list: request.object.spec.initContainers
-            patchesJson6902: |-
-              - path: /spec/initContainers/{{elementIndex}}/resources/limits/cpu
-                op: remove
+  evaluation:
+    admission:
+      enabled: true
+    mutateExisting:
+      enabled: false
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - ""
+        apiVersions:
+          - "v1"
+        operations:
+          - "CREATE"
+          - "UPDATE"
+        resources:
+          - "pods"
+      - apiGroups:
+          - "apps"
+        apiVersions:
+          - "v1"
+        operations:
+          - "CREATE"
+          - "UPDATE"
+        resources:
+          - "deployments"
+          - "statefulsets"
+          - "daemonsets"
+      - apiGroups:
+          - "batch"
+        apiVersions:
+          - "v1"
+        operations:
+          - "CREATE"
+          - "UPDATE"
+        resources:
+          - "jobs"
+          - "cronjobs"
+  variables:
+    - name: podSpec
+      expression: >-
+        object.kind == 'Pod' ? object.spec : (object.kind == 'CronJob' ?
+        object.spec.jobTemplate.spec.template.spec : object.spec.template.spec)
+    - name: allContainers
+      expression: >-
+        variables.podSpec.?containers.orValue([]) +
+        variables.podSpec.?initContainers.orValue([]) +
+        variables.podSpec.?ephemeralContainers.orValue([])
+    - name: cpuLimits
+      expression: >-
+        variables.allContainers.map(c, has(c.resources.limits) && has(c.resources.limits.cpu))
+  mutations:
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: >-
+          variables.podSpec.?containers.orValue([])
+            .filter(c, variables.cpuLimits[variables.allContainers.indexOf(c)])
+            .map(c, {
+              "op": "remove",
+              "path": (object.kind == 'Pod' ? "/spec" : (object.kind == 'CronJob' ? "/spec/jobTemplate/spec/template/spec" : "/spec/template/spec")) + "/containers/" + string(variables.podSpec.containers.indexOf(c)) + "/resources/limits/cpu"
+            }) +
+          variables.podSpec.?initContainers.orValue([])
+            .filter(c, variables.cpuLimits[variables.allContainers.indexOf(c)])
+            .map(c, {
+              "op": "remove",
+              "path": (object.kind == 'Pod' ? "/spec" : (object.kind == 'CronJob' ? "/spec/jobTemplate/spec/template/spec" : "/spec/template/spec")) + "/initContainers/" + string(variables.podSpec.initContainers.indexOf(c)) + "/resources/limits/cpu"
+            }) +
+          variables.podSpec.?ephemeralContainers.orValue([])
+            .filter(c, variables.cpuLimits[variables.allContainers.indexOf(c)])
+            .map(c, {
+              "op": "remove",
+              "path": (object.kind == 'Pod' ? "/spec" : (object.kind == 'CronJob' ? "/spec/jobTemplate/spec/template/spec" : "/spec/template/spec")) + "/ephemeralContainers/" + string(variables.podSpec.ephemeralContainers.indexOf(c)) + "/resources/limits/cpu"
+            })

@@ -1,0 +1,40 @@
+---
+# Grants Kyverno permission to read + manage Envoy Gateway SecurityPolicies, so the
+# httproute-authentik-forward-auth generate policy can validate (admission controller)
+# and create/sync them (background controller). Uses Kyverno's RBAC aggregation labels
+# rather than the chart's extraResources (which didn't render the CRD grant reliably).
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kyverno:securitypolicies-access
+  labels:
+    app.kubernetes.io/part-of: kyverno
+    rbac.kyverno.io/aggregate-to-admission-controller: "true"
+    rbac.kyverno.io/aggregate-to-background-controller: "true"
+rules:
+  - apiGroups:
+      - gateway.envoyproxy.io
+    resources:
+      - securitypolicies
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+  # ReferenceGrant lets the generated SecurityPolicy (app ns) reach the outpost
+  # Service in `security`. The forward-auth policy generates these per-namespace.
+  - apiGroups:
+      - gateway.networking.k8s.io
+    resources:
+      - referencegrants
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
