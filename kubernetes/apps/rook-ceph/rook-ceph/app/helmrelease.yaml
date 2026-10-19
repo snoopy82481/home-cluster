@@ -15,7 +15,7 @@ spec:
     csi:
       cephcsi:
         repository: quay.io/cephcsi/cephcsi
-        tag: v3.17.1
+        tag: v3.18.1-rocky9
 
     image:
       repository: ghcr.io/rook/ceph
