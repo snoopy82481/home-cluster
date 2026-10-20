@@ -12,6 +12,6 @@ resources:
   - ./grafana-operator/ks.yaml
   - ./kromgo/ks.yaml
   - ./kube-prometheus-stack/ks.yaml
-  - ./kyverno/ks.yaml
+  #  - ./kyverno/ks.yaml
   - ./namespace.yaml
   - ./victoria-logs/ks.yaml
