@@ -90,50 +90,50 @@ url = "https://github.com/cilium/cilium-cli/releases/download/v0.20.1/cilium-win
 url_api = "https://api.github.com/repos/cilium/cilium-cli/releases/assets/585358777"
 
 [[tools.doppler]]
-version = "3.77.0"
+version = "3.77.1"
 backend = "github:DopplerHQ/cli"
-specifiers = ["3.77.0"]
+specifiers = ["3.77.1"]
 
 [tools.doppler."platforms.linux-arm64"]
-checksum = "sha256:3aa603d60bc8502ec67d9a57e917925f357ac2822eead484acda3875fe6a4d95"
-url = "https://github.com/DopplerHQ/cli/releases/download/3.77.0/doppler_3.77.0_linux_arm64.tar.gz"
-url_api = "https://api.github.com/repos/DopplerHQ/cli/releases/assets/619058288"
+checksum = "sha256:a7f4be5b30295921dfe1cdc34f905cd017210ec3264a47d46e315ab09cb03e1c"
+url = "https://github.com/DopplerHQ/cli/releases/download/3.77.1/doppler_3.77.1_linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/DopplerHQ/cli/releases/assets/666340963"
 provenance = "github-attestations"
 
 [tools.doppler."platforms.linux-arm64-musl"]
-checksum = "sha256:3aa603d60bc8502ec67d9a57e917925f357ac2822eead484acda3875fe6a4d95"
-url = "https://github.com/DopplerHQ/cli/releases/download/3.77.0/doppler_3.77.0_linux_arm64.tar.gz"
-url_api = "https://api.github.com/repos/DopplerHQ/cli/releases/assets/619058288"
+checksum = "sha256:a7f4be5b30295921dfe1cdc34f905cd017210ec3264a47d46e315ab09cb03e1c"
+url = "https://github.com/DopplerHQ/cli/releases/download/3.77.1/doppler_3.77.1_linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/DopplerHQ/cli/releases/assets/666340963"
 provenance = "github-attestations"
 
 [tools.doppler."platforms.linux-x64"]
-checksum = "sha256:92587cb89c2ff82fc2ddec2b2a9f275ff320994a44e16cd9310b55a429a82084"
-url = "https://github.com/DopplerHQ/cli/releases/download/3.77.0/doppler_3.77.0_linux_amd64.tar.gz"
-url_api = "https://api.github.com/repos/DopplerHQ/cli/releases/assets/619058219"
+checksum = "sha256:001f89a42629f9cb827cd86683c4c2dbf87c6299a8d6130643b98044bf5ed80a"
+url = "https://github.com/DopplerHQ/cli/releases/download/3.77.1/doppler_3.77.1_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/DopplerHQ/cli/releases/assets/666340974"
 provenance = "github-attestations"
 
 [tools.doppler."platforms.linux-x64-musl"]
-checksum = "sha256:92587cb89c2ff82fc2ddec2b2a9f275ff320994a44e16cd9310b55a429a82084"
-url = "https://github.com/DopplerHQ/cli/releases/download/3.77.0/doppler_3.77.0_linux_amd64.tar.gz"
-url_api = "https://api.github.com/repos/DopplerHQ/cli/releases/assets/619058219"
+checksum = "sha256:001f89a42629f9cb827cd86683c4c2dbf87c6299a8d6130643b98044bf5ed80a"
+url = "https://github.com/DopplerHQ/cli/releases/download/3.77.1/doppler_3.77.1_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/DopplerHQ/cli/releases/assets/666340974"
 provenance = "github-attestations"
 
 [tools.doppler."platforms.macos-arm64"]
-checksum = "sha256:19e1f7ff2655e3bb5ea1ba9892de5a5a74de6a7a6f021e1f63f30627d5936f13"
-url = "https://github.com/DopplerHQ/cli/releases/download/3.77.0/doppler_3.77.0_macOS_arm64.tar.gz"
-url_api = "https://api.github.com/repos/DopplerHQ/cli/releases/assets/619058200"
+checksum = "sha256:e0033d287811de122e7a353a4d548f72ff3103b3010147ce80299f28b5313df2"
+url = "https://github.com/DopplerHQ/cli/releases/download/3.77.1/doppler_3.77.1_macOS_arm64.tar.gz"
+url_api = "https://api.github.com/repos/DopplerHQ/cli/releases/assets/666340971"
 provenance = "github-attestations"
 
 [tools.doppler."platforms.macos-x64"]
-checksum = "sha256:315c09fdd5306d781057705f2180e2e0719c7fb6a3df8982cbfd593234278c8a"
-url = "https://github.com/DopplerHQ/cli/releases/download/3.77.0/doppler_3.77.0_macOS_amd64.tar.gz"
-url_api = "https://api.github.com/repos/DopplerHQ/cli/releases/assets/619058297"
+checksum = "sha256:4b43a27ec72e33b7fa187ab4f0ba4005cafd7fe7b925de79c4df696a1f15a8df"
+url = "https://github.com/DopplerHQ/cli/releases/download/3.77.1/doppler_3.77.1_macOS_amd64.tar.gz"
+url_api = "https://api.github.com/repos/DopplerHQ/cli/releases/assets/666340970"
 provenance = "github-attestations"
 
 [tools.doppler."platforms.windows-x64"]
-checksum = "sha256:5f4f7bfade468d77706acf365c6e5045afd234031743b15bd07af034857f46fe"
-url = "https://github.com/DopplerHQ/cli/releases/download/3.77.0/doppler_3.77.0_windows_amd64.zip"
-url_api = "https://api.github.com/repos/DopplerHQ/cli/releases/assets/619058291"
+checksum = "sha256:d647b53549b126b9820d35e6001569aed0ddcdc788ceb7826395ca34506ef95c"
+url = "https://github.com/DopplerHQ/cli/releases/download/3.77.1/doppler_3.77.1_windows_amd64.zip"
+url_api = "https://api.github.com/repos/DopplerHQ/cli/releases/assets/666340960"
 provenance = "github-attestations"
 
 [[tools."github:home-operations/flate"]]
@@ -177,44 +177,44 @@ url = "https://github.com/home-operations/flate/releases/download/v0.6.5/flate_0
 url_api = "https://api.github.com/repos/home-operations/flate/releases/assets/541337344"
 
 [[tools."github:mitsuhiko/minijinja"]]
-version = "3.0.1"
+version = "3.0.3"
 backend = "github:mitsuhiko/minijinja"
-specifiers = ["3.0.1"]
+specifiers = ["3.0.3"]
 
 [tools."github:mitsuhiko/minijinja"."platforms.linux-arm64"]
-checksum = "sha256:445bf828667b1ab083cc61383c71897c6c62435bdff797c30d0ca1d4c63f1e25"
-url = "https://github.com/mitsuhiko/minijinja/releases/download/3.0.1/minijinja-cli-aarch64-unknown-linux-gnu.tar.xz"
-url_api = "https://api.github.com/repos/mitsuhiko/minijinja/releases/assets/644229133"
+checksum = "sha256:b41fee71256ee3ea0f0b3fa32bc7042f4a3db5049ede6262c8d480078a7a67ba"
+url = "https://github.com/mitsuhiko/minijinja/releases/download/3.0.3/minijinja-cli-aarch64-unknown-linux-gnu.tar.xz"
+url_api = "https://api.github.com/repos/mitsuhiko/minijinja/releases/assets/668256982"
 
 [tools."github:mitsuhiko/minijinja"."platforms.linux-arm64-musl"]
-checksum = "sha256:c661dce36c03ec45e36fb781d5edd95fea43556fd99cbad146f3a9a2a502329a"
-url = "https://github.com/mitsuhiko/minijinja/releases/download/3.0.1/minijinja-cli-aarch64-unknown-linux-musl.tar.xz"
-url_api = "https://api.github.com/repos/mitsuhiko/minijinja/releases/assets/644229135"
+checksum = "sha256:42e1b33a664ac36eec5226e2aebce56396ddb22d8a673cabbfb7b48fbc21a4ea"
+url = "https://github.com/mitsuhiko/minijinja/releases/download/3.0.3/minijinja-cli-aarch64-unknown-linux-musl.tar.xz"
+url_api = "https://api.github.com/repos/mitsuhiko/minijinja/releases/assets/668256980"
 
 [tools."github:mitsuhiko/minijinja"."platforms.linux-x64"]
-checksum = "sha256:5b2eb07b18d5804e50b4e83ebdaae9b70dda37f4a2d058987881396e6c91c8b6"
-url = "https://github.com/mitsuhiko/minijinja/releases/download/3.0.1/minijinja-cli-x86_64-unknown-linux-gnu.tar.xz"
-url_api = "https://api.github.com/repos/mitsuhiko/minijinja/releases/assets/644229276"
+checksum = "sha256:8db0a7cdc55975e2abace49b18c0076f338f806645ab6b08097a9417189e4888"
+url = "https://github.com/mitsuhiko/minijinja/releases/download/3.0.3/minijinja-cli-x86_64-unknown-linux-gnu.tar.xz"
+url_api = "https://api.github.com/repos/mitsuhiko/minijinja/releases/assets/668257054"
 
 [tools."github:mitsuhiko/minijinja"."platforms.linux-x64-musl"]
-checksum = "sha256:15a34e7c71772d0db06c060c1c410bfe788448a28209bc64559f396108772382"
-url = "https://github.com/mitsuhiko/minijinja/releases/download/3.0.1/minijinja-cli-x86_64-unknown-linux-musl.tar.xz"
-url_api = "https://api.github.com/repos/mitsuhiko/minijinja/releases/assets/644229296"
+checksum = "sha256:5117cfc78ebf2b3645ed6ebd6cd953f2ce830ba5efbdac4decbc0a6191d27f8a"
+url = "https://github.com/mitsuhiko/minijinja/releases/download/3.0.3/minijinja-cli-x86_64-unknown-linux-musl.tar.xz"
+url_api = "https://api.github.com/repos/mitsuhiko/minijinja/releases/assets/668257066"
 
 [tools."github:mitsuhiko/minijinja"."platforms.macos-arm64"]
-checksum = "sha256:a171668f90ff02f6b9234437eb96b1588357e3fd522135cd79c36681282c1f4c"
-url = "https://github.com/mitsuhiko/minijinja/releases/download/3.0.1/minijinja-cli-aarch64-apple-darwin.tar.xz"
-url_api = "https://api.github.com/repos/mitsuhiko/minijinja/releases/assets/644229103"
+checksum = "sha256:815f3bf68d18b4cd49e3e3473a083910f1b1a8a7eb1bc6cf0aa1c8d404871c96"
+url = "https://github.com/mitsuhiko/minijinja/releases/download/3.0.3/minijinja-cli-aarch64-apple-darwin.tar.xz"
+url_api = "https://api.github.com/repos/mitsuhiko/minijinja/releases/assets/668256939"
 
 [tools."github:mitsuhiko/minijinja"."platforms.macos-x64"]
-checksum = "sha256:30fecfdee3c2548fba8b6cb37174698e6c34371406eb778d30173ab30ea3c304"
-url = "https://github.com/mitsuhiko/minijinja/releases/download/3.0.1/minijinja-cli-x86_64-apple-darwin.tar.xz"
-url_api = "https://api.github.com/repos/mitsuhiko/minijinja/releases/assets/644229232"
+checksum = "sha256:f3b7516d5f76007d068f3eb59e5de3fea4c386e9aed6b286d3b7617ab77b42f5"
+url = "https://github.com/mitsuhiko/minijinja/releases/download/3.0.3/minijinja-cli-x86_64-apple-darwin.tar.xz"
+url_api = "https://api.github.com/repos/mitsuhiko/minijinja/releases/assets/668257035"
 
 [tools."github:mitsuhiko/minijinja"."platforms.windows-x64"]
-checksum = "sha256:fb50e280eb2356672319e092aee51f28b870e9feddc145ef56abcbeef22e5fd2"
-url = "https://github.com/mitsuhiko/minijinja/releases/download/3.0.1/minijinja-cli-x86_64-pc-windows-msvc.zip"
-url_api = "https://api.github.com/repos/mitsuhiko/minijinja/releases/assets/644229249"
+checksum = "sha256:3a14bfaf1fc05487f31b47a2bb7ca3344cfd4af7a60faebe912afa4d6ea65b58"
+url = "https://github.com/mitsuhiko/minijinja/releases/download/3.0.3/minijinja-cli-x86_64-pc-windows-msvc.zip"
+url_api = "https://api.github.com/repos/mitsuhiko/minijinja/releases/assets/668257043"
 
 [[tools.jq]]
 version = "1.8.2"
