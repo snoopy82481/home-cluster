@@ -163,7 +163,7 @@ spec:
           subjects:
             - kind: ServiceAccount
               name: homepage
-              namespace: web-tools
+              namespace: selfhosted
           type: ClusterRoleBinding
 
       roles:
