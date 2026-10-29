@@ -5,5 +5,5 @@ kind: Kustomization
 
 resources:
   - ./external-secrets
-  - ./flux-system
+  # - ./flux-system
   - ./networking

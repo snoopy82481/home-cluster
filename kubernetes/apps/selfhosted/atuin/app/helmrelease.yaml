@@ -1,0 +1,91 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: atuin
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: atuin
+  interval: 1h
+  values:
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+
+    controllers:
+      atuin:
+        annotations:
+          reloader.stakater.com/auto: "true"
+
+        containers:
+          atuin:
+            image:
+              repository: ghcr.io/atuinsh/atuin
+              tag: 18.24.3@sha256:aed6e5efed2b5b6a7d5e5d77e07b122613ea1cafe65f9f7e0193a4ef760961ba
+
+            args:
+              - start
+
+            env:
+              ATUIN_DB_URI: sqlite:///config/atuin.db
+              ATUIN_HOST: "0.0.0.0"
+              ATUIN_OPEN_REGISTRATION: "true"
+              ATUIN_PORT: &port 8888
+              TZ: America/Boise
+
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  failureThreshold: 3
+                  httpGet:
+                    path: /healthz
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+              readiness: *probes
+
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 256Mi
+
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - "ALL"
+              readOnlyRootFilesystem: true
+
+    persistence:
+      config:
+        existingClaim: "{{ .Release.Name }}"
+
+    route:
+      atuin:
+        enabled: true
+        hostnames:
+          - "{{ .Release.Name }}.idahobealefamily.com"
+        parentRefs:
+          - name: envoy-internal
+            namespace: networking
+        rules:
+          - backendRefs:
+              - identifier: atuin
+                port: *port
+
+    service:
+      atuin:
+        controller: atuin
+        ports:
+          http:
+            port: *port

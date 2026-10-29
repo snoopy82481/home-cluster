@@ -1,0 +1,8 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ceph-csi-pinned-images
+  namespace: rook-ceph
+data:
+  plugin: quay.io/cephcsi/cephcsi:v3.17.1

@@ -7,7 +7,7 @@ description: Add a Kubernetes application by gathering its deployment requiremen
 
 This skill is the source of truth for the app-creation workflow and repository conventions below. Ask about the app's needs, then write the required manifests directly. Do not render or depend on `kubernetes/templates/`, MiniJinja, or `just kube create-app`.
 
-Read `.agents/instructions/sorting.instructions.md` before writing manifests. Verify changing facts such as chart versions, image tags, and supported chart values against the current repository and upstream documentation. Existing apps are examples of specific integrations, not defaults to copy wholesale.
+Read `.agents/instructions/sorting_instructions.md` before writing manifests. Verify changing facts such as chart versions, image tags, and supported chart values against the current repository and upstream documentation. Existing apps are examples of specific integrations, not defaults to copy wholesale.
 
 ## 1. Work out what the app needs
 
@@ -19,7 +19,7 @@ Work through these decisions before writing the affected manifests:
 | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Identity      | App name and namespace; reuse an existing namespace or create one.                                                                                                                                                                                                                |
 | Deployment    | Container with app-template or an upstream Helm chart; long-running service, background worker, or scheduled job. Research the image/chart and recommend the appropriate approach if the user has no preference.                                                                  |
-| Networking    | Whether a Service is needed, its ports/protocols, and whether a hostname is wanted. For a route, ask internal or public exposure and establish the hostname. Suggest internal exposure and `<app>.idahobealefamily.com`; do not expose an app publicly without the user's choice. |
+| Networking    | Whether a Service is needed, its ports/protocols, and whether a hostname is wanted. For a route, ask internal or public exposure and establish the hostname. Suggest internal exposure and `"{{ .Release.Name }}.idahobealefamily.com"`; do not expose an app publicly without the user's choice. |
 | Data          | Whether state must survive restarts, the data paths and capacity, and whether it needs kopiur backup, an existing claim, NFS, or only ephemeral storage. Do not equate all persistence with backup.                                                                               |
 | Configuration | Required environment variables, mounted files, Secret names/keys, and external services. Ask for missing configuration choices rather than guessing them.                                                                                                                         |
 | Operation     | Dependencies on other Flux Kustomizations, required schedule/timezone, and any user-specified resource or placement constraints.                                                                                                                                                  |
@@ -48,10 +48,10 @@ kubernetes/apps/<namespace>/<app>/
     ├── kustomization.yaml
     ├── ocirepository.yaml
     ├── helmrelease.yaml
-    └── resources/          # optional non-secret mounted configuration
+    └── resources/              # complex configuration files or additional manifests
 ```
 
-Include the appropriate YAML language-server schema comments, following current files of the same resource type.
+Include the appropriate YAML language-server schema comments, following current files of the same resource type. If there is a schema available in the `https://k8s-schemas.home-operations.com` endpoint use that over any other schema.
 
 ### Flux Kustomization: ks.yaml
 
@@ -77,6 +77,16 @@ For another storage design, create or reference the agreed storage without addin
 
 Use `kustomize.config.k8s.io/v1beta1`, kind `Kustomization`. Register `./helmrelease.yaml`, `./ocirepository.yaml`, and any additional resources actually created or already present. Do not reference files that do not exist.
 
+```yaml
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./helmrelease.yaml
+  - ./ocirepository.yaml
+```
+
 ### OCIRepository: app/ocirepository.yaml
 
 Use `source.toolkit.fluxcd.io/v1`, kind `OCIRepository`, with the app name as `metadata.name`. Set `spec.interval: 5m` and `spec.layerSelector` to media type `application/vnd.cncf.helm.chart.content.v1.tar+gzip`, operation `copy`.
@@ -86,6 +96,13 @@ For app-template, use `spec.url: oci://ghcr.io/bjw-s-labs/helm/app-template`. Re
 ### HelmRelease: app/helmrelease.yaml
 
 Use `helm.toolkit.fluxcd.io/v2`, kind `HelmRelease`, with the app name as `metadata.name`. For an OCI source, set `spec.chartRef.kind: OCIRepository` and `spec.chartRef.name` to the matching resource name. Use `spec.interval: 1h`.
+
+App-template wraps the bjw-s Common Library. Its supported keys, including `controllers`, `configMaps`, `externalSecrets`, `networkPolicies` and `persistence`, go directly under `spec.values`, without an extra `common` or `app-template` level. Verify the selected chart version's schema and values against the upstream references:
+
+- [App-template and Common Library](https://bjw-s-labs.github.io/helm-charts/docs/app-template/)
+- [ConfigMaps](https://bjw-s-labs.github.io/helm-charts/docs/app-template/reference/configmaps/)
+- [ExternalSecrets](https://bjw-s-labs.github.io/helm-charts/docs/app-template/reference/externalsecrets/)
+- [NetworkPolicies](https://bjw-s-labs.github.io/helm-charts/docs/app-template/reference/networkpolicies/)
 
 For app-template, construct `spec.values` from the selected requirements:
 
@@ -102,9 +119,21 @@ For an upstream chart, use its documented values and source configuration. Do no
 
 ### Mounted configuration and Secrets
 
-Put non-secret mounted files in `app/resources/` and add a `configMapGenerator` to `app/kustomization.yaml`. Use `generatorOptions.disableNameSuffixHash: true` for stable HelmRelease references. Add `generatorOptions.annotations.kustomize.toolkit.fluxcd.io/substitute: disabled` when the generated configuration must bypass Flux substitution. Add matching configMap mounts, including `subPath` for individual files.
+Choose placement according to the chart and configuration complexity:
 
-Reference user-managed Secrets by exact name and keys through `envFrom` or `env.valueFrom.secretKeyRef`. Register an existing app-local encrypted manifest when needed without modifying its contents. Do not invent credentials, ExternalSecrets, or a secret backend.
+| Deployment | Placement |
+| ---------- | --------- |
+| App-template with basic configuration | Define ConfigMaps in `spec.values.configMaps`, with file contents under the entry's `data`. Mount them through supported `persistence` values. |
+| App-template requiring external secrets | Define ExternalSecrets in `spec.values.externalSecrets`. Use an established secret store and confirmed remote keys; reference the resulting Secret from the workload. |
+| App-template requiring network policies | Define NetworkPolicies in `spec.values.networkPolicies`. The policy is defined to the app-name controller. The `spec.values.networkPolicies.app.type` will always be `cilium`. Ensure the policies align with the app's actual network requirements and the cluster's network configuration. |
+| App-template with a complex configuration set spanning multiple files, such as Homepage | Keep the configuration files in `app/resources/` and generate ConfigMaps with `configMapGenerator` in `app/kustomization.yaml`. Keep other basic ConfigMaps and ExternalSecrets in chart values. |
+| An official or other upstream chart | Follow that chart's documented values for configuration, secrets, mounts, and persistence. Put additional Kubernetes manifests the chart does not provide in `app/resources/`, including ExternalSecrets and ConfigMaps, and register them in `app/kustomization.yaml`. Keep external configuration files there too. |
+
+For file-backed ConfigMaps, use `generatorOptions.disableNameSuffixHash: true` for stable HelmRelease references. Add `generatorOptions.annotations.kustomize.toolkit.fluxcd.io/substitute: disabled` when the generated configuration must bypass Flux substitution. Add matching configMap mounts, including `subPath` for individual files. Files passed to `configMapGenerator.files` are configuration data; do not also register them as Kubernetes resources. Register standalone manifests as `./resources/<filename>.yaml`, or reference a resources-directory kustomization if present.
+
+Do not assume Helm can read files from the surrounding Git checkout. Files in `app/resources/` are not packaged into the OCI chart; use Kustomize generators for those files rather than chart filesystem helpers.
+
+ExternalSecret definitions contain references and metadata, not credential values. Create these definitions when the required store and remote keys are established; do not invent a backend or credentials. Ask for missing reference details without requesting secret values. Reference existing user-managed Secrets by exact name and keys through `envFrom`, `env.valueFrom.secretKeyRef`, or the upstream chart's documented equivalent. Register an existing app-local encrypted manifest when needed without modifying its contents.
 
 ## 3. Register the app and namespace
 
@@ -125,7 +154,7 @@ kustomize build "kubernetes/apps/$namespace/$app/app"
 yamllint --config-file .github/linters/.yamllint.yaml "kubernetes/apps/$namespace/$app"
 ```
 
-Validate changed namespace manifests too. A plain app-directory build does not expand Flux `spec.components`, apply Flux substitutions, or render the Helm chart. For component integration, use a temporary workspace and an offline Flux build to verify substitutions and generated resources. Render the selected Helm chart with the authored values to check its schema and workload wiring, including Service selectors, route backends, and PVC names where applicable. Avoid printing secret contents during validation.
+Validate changed namespace manifests too. A plain app-directory build does not expand Flux `spec.components`, apply Flux substitutions, or render the Helm chart. For component integration, use a temporary workspace and an offline Flux build to verify substitutions and generated resources. Render the selected Helm chart with the authored values to check its schema and workload wiring, including generated ConfigMaps and ExternalSecrets, their names and workload references, Service selectors, route backends, and PVC names where applicable. For file-backed configuration, also inspect the Kustomize-generated ConfigMap keys and mount paths; Helm rendering alone does not include those resources. Avoid printing secret contents during validation.
 
 Check that there are no placeholders, empty image/chart fields, invalid ports, or references to missing local resources. Intentional Flux `${...}` substitutions and chart-supported Helm expressions may remain literal before their respective rendering stages.
 

@@ -16,7 +16,7 @@ spec:
           echo-server:
             image:
               repository: ghcr.io/mendhak/http-https-echo
-              tag: 42
+              tag: 43
 
             env:
               HTTP_PORT: &port 8080

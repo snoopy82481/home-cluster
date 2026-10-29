@@ -13,9 +13,6 @@ bases:
 
 defaultInherit: default
 releases:
-  - name: cloudflare-dns
-    namespace: networking
-
   - name: envoy-gateway
     namespace: networking
 

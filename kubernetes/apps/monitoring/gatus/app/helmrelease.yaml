@@ -28,7 +28,7 @@ spec:
           gatus-sidecar:
             image:
               repository: ghcr.io/home-operations/gatus-sidecar
-              tag: 0.5.5@sha256:aa5decde4c807b81c1f76c1fa69d5829c96a0165672ee596b9edd38ab5041715
+              tag: 0.6.0@sha256:1d3e6b0c50b9addcbbc68b67ab63b10718afcb3a47909f6644a1ee844dd9e6c2
 
             args:
               - --auto-httproute
@@ -54,7 +54,7 @@ spec:
           gatus:
             image:
               repository: ghcr.io/twin/gatus
-              tag: v5.37.0@sha256:094eb186e55235db367e90e9d56140e5897b7044c41de23cde4cc18e6da1242e
+              tag: v5.38.0@sha256:085ed63da963728965d00a3c78aa6167e3bf135218485b893201758e079e8415
 
             env:
               GATUS_DELAY_START_SECONDS: 5
