@@ -6,10 +6,10 @@ metadata:
   name: cluster-apps
   namespace: flux-system
 spec:
-  deletionPolicy: WaitForTermination
+  deletionPolicy: Orphan
   interval: 1h
   path: ./kubernetes/apps
-  prune: true
+  prune: false
   sourceRef:
     kind: GitRepository
     name: flux-system
