@@ -7,13 +7,13 @@ the namespace's directory as the path.
 With git history, diff it against the base, which flate renders from that
 revision in a temporary directory:
 
-```
+```bash
 flate diff hr <name> --base origin/main --path kubernetes/apps/<namespace> --no-progress -o diff
 ```
 
 Without history, as in kritika's checkout, build the head alone:
 
-```
+```bash
 flate build hr <name> --path kubernetes/apps/<namespace> --no-progress
 ```
 
@@ -21,7 +21,7 @@ A HelmRelease whose Kustomization depends on one in another namespace is
 reported as blocked there; render it from the whole tree instead, which
 takes several times the memory:
 
-```
+```bash
 flate build hr <name> -n <namespace> --path kubernetes/apps --no-progress
 ```
 
