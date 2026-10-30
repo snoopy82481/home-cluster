@@ -3,7 +3,7 @@
     - Sonarr:
         - Sonarr TV:
             href: https://sonarr.idahobealefamily.com
-            icon: sonarr.png
+            icon: sonarr
             description: TV Shows
             app: sonarr
             namespace: media
@@ -14,7 +14,7 @@
 
         - Sonarr Anime:
             href: https://sonarranime.idahobealefamily.com
-            icon: sonarr.png
+            icon: sonarr
             description: Anime
             app: sonarranime
             namespace: media
@@ -25,7 +25,7 @@
 
         - Sonarr UHD:
             href: https://sonarruhd.idahobealefamily.com
-            icon: sonarr.png
+            icon: sonarr
             description: UHD TV Shows
             app: sonarruhd
             namespace: media
@@ -37,7 +37,7 @@
     - Radarr:
         - Radarr:
             href: https://radarr.idahobealefamily.com
-            icon: radarr.png
+            icon: radarr
             description: Movies
             app: radarr
             namespace: media
@@ -48,7 +48,7 @@
 
         - Radarr Anime:
             href: https://radarranime.idahobealefamily.com
-            icon: radarr.png
+            icon: radarr
             description: Anime Movies
             app: radarranime
             namespace: media
@@ -59,7 +59,7 @@
 
         - Radarr UHD:
             href: https://radarruhd.idahobealefamily.com
-            icon: radarr.png
+            icon: radarr
             description: UHD Movies
             app: radarruhd
             namespace: media
@@ -70,7 +70,7 @@
 
     - Prowlarr:
         href: https://prowlarr.idahobealefamily.com
-        icon: prowlarr.png
+        icon: prowlarr
         description: Indexer Manager
         app: prowlarr
         namespace: media
@@ -81,7 +81,7 @@
 
     - Seerr:
         href: https://seerr.idahobealefamily.com
-        icon: seerr.png
+        icon: seerr
         description: Request Manager
         app: seerr
         namespace: media
@@ -92,7 +92,7 @@
 
     - Tautulli:
         href: https://tautulli.idahobealefamily.com
-        icon: tautulli.png
+        icon: tautulli
         description: Plex Monitoring
         app: tautulli
         namespace: media
@@ -105,7 +105,7 @@
 - Downloads:
     - Sabnzbd:
         href: https://sabnzbd.idahobealefamily.com
-        icon: sabnzbd.png
+        icon: sabnzbd
         description: Usenet Downloader
         app: sabnzbd
         namespace: media
@@ -116,7 +116,7 @@
 
     - qBittorrent:
         href: https://qbittorrent.idahobealefamily.com
-        icon: qbittorrent.png
+        icon: qbittorrent
         description: Torrent Downloader
         app: qbittorrent
         namespace: downloads
@@ -127,7 +127,7 @@
 - Monitoring:
     - Grafana:
         href: https://grafana.idahobealefamily.com
-        icon: grafana.png
+        icon: grafana
         description: Monitoring Dashboard
         app: grafana-operator
         namespace: monitoring
@@ -141,7 +141,7 @@
 
     - Prometheus Metrics:
         href: https://prometheus.idahobealefamily.com
-        icon: prometheus.png
+        icon: prometheus
         description: Monitoring Metrics
         app: prometheus
         namespace: monitoring
@@ -152,7 +152,7 @@
 - Storage:
     - TrueNAS:
         href: https://truenas.internal
-        icon: truenas.png
+        icon: truenas
         description: TrueNAS Storage
         widget:
           type: truenas
@@ -163,7 +163,7 @@
 - Networking:
     - Omada:
         href: https://omada.internal:8043
-        icon: omada.png
+        icon: omada
         description: Omada Controller
         widget:
           type: omada
@@ -174,7 +174,7 @@
 
     - pfSense:
         href: https://pfsense.idahobealefamily.com:10443
-        icon: pfsense.png
+        icon: pfsense
         description: pfSense Firewall
         widget:
           type: pfsense
@@ -190,7 +190,7 @@
 
     - Cloudflared:
         href: https://dash.cloudflare.com/
-        icon: cloudflare-zero-trust.png
+        icon: cloudflare-zero-trust
         description: Cloudflared Tunnel
         app: cloudflare-tunnel
         namespace: networking
@@ -208,7 +208,7 @@
 - Infrastructure:
     - Proxmox:
         href: https://proxmox.idahobealefamily.com:8006
-        icon: proxmox.png
+        icon: proxmox
         description: Proxmox VE
         widget:
           type: proxmox

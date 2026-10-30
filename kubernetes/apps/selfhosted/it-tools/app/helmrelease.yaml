@@ -134,6 +134,12 @@ spec:
 
     route:
       app:
+        annotations:
+          gethomepage.dev/description: Handy tools for IT professionals.
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/group: Selfhosted
+          gethomepage.dev/icon: it-tools
+          gethomepage.dev/name: it-tools
         hostnames:
           - it-tools.idahobealefamily.com
         parentRefs:
