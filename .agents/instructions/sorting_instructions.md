@@ -2,11 +2,14 @@
 
 Whenever asked to sort these files, follow these instructions:
 
-- **Default rule**: All fields and properties should be sorted alphabetically at every level of the YAML structure, regardless of how deeply nested they are, unless a specific override rule is provided below or in other applicable instructions files.
+- **Default rule**: All fields and properties should be sorted alphabetically at every level of the
+  YAML structure, regardless of how deeply nested they are, unless a specific override rule is
+  provided below or in other applicable instructions files.
 
 ## Override rules for Kubernetes related file types
 
-- Whenever they are present on the same level of a YAML structure, these fields should be sorted as follows:
+- Whenever they are present on the same level of a YAML structure, these fields should be sorted as
+  follows:
   - `apiVersion`
   - `kind`
   - `metadata`
@@ -20,13 +23,16 @@ Whenever asked to sort these files, follow these instructions:
 
 ## HelmReleases based on app-template
 
-This section gives instructions specifically for HelmReleases that are based on the `app-template` chart. These can be identified by the presence of a sidecar `ocirepository.yaml` file that references `oci://ghcr.io/bjw-s-labs/helm/app-template` in the `url` field.
+This section gives instructions specifically for HelmReleases that are based on the `app-template`
+chart. These can be identified by the presence of a sidecar `ocirepository.yaml` file that
+references `oci://ghcr.io/bjw-s-labs/helm/app-template` in the `url` field.
 
 ### Sorting rules
 
 Whenever asked to sort these files, follow these instructions:
 
-- Whenever there is an `enabled` field, it should be the first field within its section, unless a more specific rule below dictates otherwise.
+- Whenever there is an `enabled` field, it should be the first field within its section, unless a
+  more specific rule below dictates otherwise.
 
 - The items within the `spec` section should be sorted as follows:
   - `chartRef`
@@ -38,11 +44,17 @@ Whenever asked to sort these files, follow these instructions:
 
 - Items within the `spec.values` section should be sorted as follows:
   - `defaultPodOptions` (if present)
-  - All sibling keys at the `spec.values` level should be sorted alphabetically (e.g., `controllers`, `persistence`, `route`, `service`)
+  - All sibling keys at the `spec.values` level should be sorted alphabetically (e.g.,
+    `controllers`, `persistence`, `route`, `service`)
 
-Note: Sibling keys within `persistence.*`, `service.*`, `route.*`, `configMaps.*`, etc. are NOT required to be sorted - only the keys within each individual item. For example, if `persistence` has `config`, `data`, and `tmpfs` as children, they can be in any order. Only the keys within `persistence.config`, `persistence.data`, etc. should be sorted.
+Note: Sibling keys within `persistence.*`, `service.*`, `route.*`, `configMaps.*`, etc. are NOT
+required to be sorted - only the keys within each individual item. For example, if `persistence` has
+`config`, `data`, and `tmpfs` as children, they can be in any order. Only the keys within
+`persistence.config`, `persistence.data`, etc. should be sorted.
 
-**Important:** The sorting rules apply to the HelmRelease structure itself. Do NOT sort arbitrary YAML content embedded within string fields (e.g., `configMap.data.*` values containing YAML configurations).
+**Important:** The sorting rules apply to the HelmRelease structure itself. Do NOT sort arbitrary
+YAML content embedded within string fields (e.g., `configMap.data.*` values containing YAML
+configurations).
 
 ### General pattern for section keys
 
@@ -60,7 +72,8 @@ Unless a more specific rule applies, keys within any section should be ordered a
   - `labels` (if present)
   - Controller-specific fields such as `cronjob` or `statefulset` (if present)
   - `pod`
-  - Any other fields should be sorted alphabetically, except the following fields which should come last (and in this order):
+  - Any other fields should be sorted alphabetically, except the following fields which should come
+    last (and in this order):
   - `initContainers` (if present)
   - `containers` (if present)
 
@@ -68,7 +81,8 @@ Unless a more specific rule applies, keys within any section should be ordered a
   - `image`
   - Any other fields should be added next in alphabetical order.
 
-- Items within `spec.values.controllers.*.containers.resources` and `spec.values.controllers.*.initContainers.resources` sections should be sorted as follows:
+- Items within `spec.values.controllers.*.containers.resources` and
+  `spec.values.controllers.*.initContainers.resources` sections should be sorted as follows:
   - `requests`
   - `limits`
 
@@ -82,7 +96,8 @@ Unless a more specific rule applies, keys within any section should be ordered a
   - `type` (if present)
   - `annotations` (if present)
   - `labels` (if present)
-  - Any other fields should be sorted alphabetically, except the following fields which should come last (and in this order):
+  - Any other fields should be sorted alphabetically, except the following fields which should come
+    last (and in this order):
   - `globalMounts` (if present)
   - `advancedMounts` (if present)
 
@@ -96,7 +111,7 @@ Unless a more specific rule applies, keys within any section should be ordered a
 
 **Decision tree for sorting HelmRelease fields:**
 
-```
+```text
 At spec.values level?
   → Yes: defaultPodOptions first (if present), then alphabetical
 
