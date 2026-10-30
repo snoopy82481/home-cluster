@@ -5,10 +5,8 @@ set quiet
 set script-interpreter := ['bash', '-euo', 'pipefail']
 set shell := ['bash', '-euo', 'pipefail', '-c']
 
-kubernetes_dir := justfile_dir() + '/kubernetes'
-controller := `talosctl config info -o yaml | yq -e '.endpoints[0]'`
-controllers := `talosctl config info -o yaml | yq -r '[.endpoints[] | tostring] | join (" ")'`
-nodes := `talosctl config info -o yaml | yq -r '[.nodes[] | tostring] | join (" ")'`
+controller := `talosctl config info -o yaml | yq -r -e '.endpoints[0]'`
+nodes := `talosctl config info -o yaml | yq -r -e '.nodes | join (" ")'`
 
 [confirm('Bootstrap cluster? [y|N]')]
 [doc('Bootstrap a Talos & Kubernetes cluster end-to-end')]
@@ -50,17 +48,17 @@ kubeconfig lb="cilium":
 [private]
 base: api-ready nodes-ready
     just log info "Running stage..." "stage" "{{ recipe_name() }}"
-    if ! kustomize build {{ source_directory() }}/kustomize/personal | just template - | yq 'with(select(.kind == "Secret" and (.stringData | tag) == "!!str"); .stringData |= from_json)' | kubectl apply --server-side --force-conflicts -f -; then
+    if ! kustomize build {{ source_directory() }}/kustomize/personal | just template - | kubectl apply --server-side --force-conflicts -f -; then
         just log fatal "Failed to apply personal manifests" "stage" "{{ recipe_name() }}"
     fi
-    if ! helmfile -f "{{ source_directory() }}/helmfile.d/crds.yaml" template -q | yq ea -e 'select(.kind == "CustomResourceDefinition")' | kubectl apply --server-side --force-conflicts -f -; then
+    if ! helmfile -f "{{ source_directory() }}/helmfile/crds.yaml" template -q | yq ea -r -e 'select(.kind == "CustomResourceDefinition")' | kubectl apply --server-side --force-conflicts -f -; then
         just log fatal "Failed to apply base crds" "stage" "{{ recipe_name() }}"
     fi
 
 [private]
 apps:
     just log info "Running stage..." "stage" "{{ recipe_name() }}"
-    if ! helmfile -f "{{ source_directory() }}/helmfile.d/apps.yaml" sync --hide-notes; then
+    if ! helmfile -f "{{ source_directory() }}/helmfile/apps.yaml" sync --hide-notes; then
         just log fatal "Failed to sync helmfile" "stage" "{{ recipe_name() }}"
     fi
 
@@ -68,9 +66,9 @@ apps:
 [private]
 api-ready:
     just log info "Running stage..." "stage" "{{ recipe_name() }}"
-    for c in {{ controllers }}; do
-        until [[ "$(curl -ks -o /dev/null -w '%{http_code}' --connect-timeout 2 "https://${c}:6443/readyz")" == "200" ]]; do
-            just log info "Waiting for kube-apiserver. Retrying in 5 seconds..." "stage" "{{ recipe_name() }}" "node" "$c"
+    for n in {{ nodes }}; do
+        until [[ "$(curl -ks -o /dev/null -w '%{http_code}' --connect-timeout 2 "https://${n}:6443/readyz")" == "200" ]]; do
+            just log info "Waiting for kube-apiserver. Retrying in 5 seconds..." "stage" "{{ recipe_name() }}" "node" "$n"
             sleep 5
         done
     done
@@ -84,49 +82,4 @@ nodes-ready:
             just log info "Nodes not available, waiting for nodes to be available. Retrying in 5 seconds..." "stage" "{{ recipe_name() }}"
             sleep 5
         done
-    fi
-
-[private]
-apply-secrets:
-    just log info "Running stage..." "stage" "{{ recipe_name() }}"
-    # export SOPS_AGE_KEY_FILE="${SOPS_AGE_KEY_FILE:-{{ source_directory() }}/../age.key}"
-
-    if kubectl create namespace flux-system --dry-run=client --output=yaml | kubectl apply --server-side --force-conflicts -f - &>/dev/null; then
-        just log info "Namespace flux-system created" "stage" "{{ recipe_name() }}"
-    else
-        just log info "Namespace flux-system already exists" "stage" "{{ recipe_name() }}"
-    fi
-
-    for secret in \
-        "{{ source_directory() }}/github-deploy-key.sops.yaml" \
-        "{{ kubernetes_dir }}/components/common/sops/cluster-secrets.sops.yaml" \
-        "{{ kubernetes_dir }}/components/common/sops/sops-age.sops.yaml"
-    do
-        name="$(basename "$secret" ".sops.yaml")"
-        if just template "$secret" | kubectl --namespace flux-system apply --server-side --filename - &>/dev/null; then
-            just log info "Secret resource is up-to-date" "resource=${name}" "stage" "{{ recipe_name() }}"
-            continue
-        else
-            just log fatal "Failed to apply secret" "resource=${name}"
-        fi
-    done
-
-[private]
-apply-secret file:
-    if [[ ! -f "{{ file }}" ]]; then
-        just log warn "File does not exist" "file={{ file }}"
-        exit 0
-    fi
-
-    resource="$(basename "{{ file }}" ".sops.yaml")"
-
-    # Check whether secret is up-to-date
-    if sops exec-file "{{ file }}" "kubectl --namespace flux-system diff --filename {}" &>/dev/null; then
-        just log info "Secret resource is up-to-date" "resource=${resource}"
-        exit 0
-    fi
-
-    # Apply secret
-    if ! sops exec-file "{{ file }}" "kubectl --namespace flux-system apply --server-side --filename {}" &>/dev/null; then
-        just log error "Failed to apply secret" "resource=${resource}"
     fi

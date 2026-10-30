@@ -143,6 +143,11 @@ spec:
 
     route:
       gatus:
+        annotations:
+          gethomepage.dev/icon: gatus
+          gethomepage.dev/group: Monitoring
+          gethomepage.dev/description: Status Monitoring
+          gethomepage.dev/enabled: "true"
         hostnames:
           - "{{ .Release.Name }}.idahobealefamily.com"
           - status.idahobealefamily.com

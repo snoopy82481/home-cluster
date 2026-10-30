@@ -1,0 +1,29 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/helmfile
+
+# This helmfile is for extracting and installing Custom Resource Definitions (CRDs) from Helm charts.
+# It is not intended to be used with helmfile apply or helmfile sync.
+helmDefaults:
+  args:
+    - --include-crds
+    - --no-hooks
+
+bases:
+  - default.yaml
+
+defaultInherit: default
+releases:
+  - name: envoy-gateway
+    namespace: networking
+
+  - name: grafana-operator
+    namespace: monitoring
+
+  - name: kopiur
+    namespace: system
+
+  - name: kube-prometheus-stack
+    namespace: monitoring
+
+  - name: snapshot-controller
+    namespace: kube-system

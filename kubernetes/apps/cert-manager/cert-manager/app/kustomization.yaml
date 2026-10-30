@@ -6,7 +6,6 @@ resources:
   - ./clusterissuers.yaml
   - ./externalsecret.yaml
   - ./helmrelease.yaml
-  # - ./secret.sops.yaml
   - ./prometheusrule.yaml
   - ./ocirepository.yaml
   - ./grafanadashboard.yaml

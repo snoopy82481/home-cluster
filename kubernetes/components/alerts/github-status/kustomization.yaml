@@ -6,4 +6,3 @@ resources:
   - ./alert.yaml
   - ./externalsecret.yaml
   - ./provider.yaml
-  # - ./secret.sops.yaml

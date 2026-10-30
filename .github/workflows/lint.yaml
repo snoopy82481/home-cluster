@@ -22,7 +22,7 @@ env:
 jobs:
   filter:
     name: changed files
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     outputs:
       markdown: ${{ steps.markdown.outputs.changed_files }}
       oxfmt: ${{ steps.oxfmt.outputs.changed_files }}
@@ -95,7 +95,7 @@ jobs:
       }}
     name: yamllint
     needs: filter
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     strategy:
       matrix:
         yaml: ${{ fromJSON(needs.filter.outputs.yaml) }}
@@ -125,7 +125,7 @@ jobs:
       }}
     name: markdownlint
     needs: filter
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     strategy:
       matrix:
         markdown: ${{ fromJSON(needs.filter.outputs.markdown) }}
@@ -152,7 +152,7 @@ jobs:
       }}
     name: oxfmt
     needs: filter
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     strategy:
       matrix:
         oxfmt: ${{ fromJSON(needs.filter.outputs.oxfmt) }}
@@ -185,7 +185,7 @@ jobs:
     if: |
       always()
     name: Lint successful
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - name: Check job status
         if: >-

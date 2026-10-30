@@ -8,7 +8,6 @@ resources:
   - ./helmrelease.yaml
   - ./httproute.yaml
   - ./ocirepository.yaml
-  # - ./secret.sops.yaml
   - ./podmonitor.yaml
   - ./prometheusrule.yaml
   - ./receiver.yaml

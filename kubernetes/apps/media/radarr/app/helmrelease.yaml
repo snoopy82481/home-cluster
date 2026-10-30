@@ -89,7 +89,6 @@ spec:
         dataFrom:
           - extract:
               key: RADARR
-
         refreshInterval: 12h
         secretStoreRef:
           kind: ClusterSecretStore

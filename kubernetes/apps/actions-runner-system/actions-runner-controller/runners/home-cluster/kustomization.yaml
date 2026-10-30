@@ -8,4 +8,3 @@ resources:
   - ./helmrelease.yaml
   - ./ocirepository.yaml
   - ./rbac.yaml
-  # - ./secrets.sops.yaml

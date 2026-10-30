@@ -1,0 +1,157 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: it-tools
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: it-tools
+  interval: 1h
+  values:
+    configMaps:
+      config:
+        data:
+          nginx.conf: |
+            worker_processes auto;
+            error_log /dev/stderr warn;
+            pid /tmp/nginx.pid;
+
+            events {
+                worker_connections 1024;
+            }
+
+            http {
+                include /etc/nginx/mime.types;
+                types {
+                    application/javascript mjs;
+                }
+                default_type application/octet-stream;
+                access_log /dev/stdout;
+                sendfile on;
+
+                client_body_temp_path /tmp/client_temp;
+                proxy_temp_path /tmp/proxy_temp;
+                fastcgi_temp_path /tmp/fastcgi_temp;
+                uwsgi_temp_path /tmp/uwsgi_temp;
+                scgi_temp_path /tmp/scgi_temp;
+
+                server {
+                    listen 8080;
+                    server_name _;
+                    root /usr/share/nginx/html;
+                    index index.html;
+
+                    location / {
+                        try_files $uri $uri/ /index.html;
+                    }
+                }
+            }
+        forceRename: it-tools-config
+
+    controllers:
+      it-tools:
+        annotations:
+          reloader.stakater.com/auto: "true"
+
+        pod:
+          labels:
+            egress.policy.home.arpa/block-all: "true"
+
+          securityContext:
+            fsGroup: 1000
+            fsGroupChangePolicy: OnRootMismatch
+            runAsGroup: 1000
+            runAsNonRoot: true
+            runAsUser: 1000
+
+        containers:
+          app:
+            image:
+              repository: ghcr.io/sharevb/it-tools
+              tag: "2026.10.25@sha256:c6e68a94af10c73cb4e53eaa78726d8abbbb4ad1a89a3f127a69f85a9ae029ab"
+
+            args:
+              - -g
+              - daemon off;
+
+            command:
+              - nginx
+
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: &port 8080
+              readiness: *probes
+
+            resources:
+              requests:
+                cpu: 10m
+                memory: 32Mi
+              limits:
+                memory: 128Mi
+
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - ALL
+              readOnlyRootFilesystem: true
+
+    networkpolicies:
+      app:
+        ingress:
+          - fromEndpoints:
+              - matchLabels:
+                  gateway.envoyproxy.io/owning-gateway-name: envoy-internal
+                  k8s:io.kubernetes.pod.namespace: networking
+            toPorts:
+              - ports:
+                  - port: "8080"
+                    protocol: TCP
+        type: cilium
+
+    persistence:
+      config:
+        type: configMap
+        identifier: config
+        globalMounts:
+          - path: /etc/nginx/nginx.conf
+            readOnly: true
+            subPath: nginx.conf
+
+      tmpfs:
+        type: emptyDir
+        medium: Memory
+        sizeLimit: 64Mi
+        globalMounts:
+          - path: /tmp
+
+    route:
+      app:
+        annotations:
+          gethomepage.dev/description: Handy tools for IT professionals.
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/group: Selfhosted
+          gethomepage.dev/icon: it-tools
+          gethomepage.dev/name: it-tools
+        hostnames:
+          - it-tools.idahobealefamily.com
+        parentRefs:
+          - name: envoy-internal
+            namespace: networking
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *port
+
+    service:
+      app:
+        ports:
+          http:
+            port: *port

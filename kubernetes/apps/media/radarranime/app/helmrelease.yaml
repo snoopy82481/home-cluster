@@ -134,7 +134,6 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: networking
-
         rules:
           - backendRefs:
               - identifier: radarranime
