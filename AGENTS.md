@@ -1,3 +1,3 @@
-@.agents/instructions/sorting.instructions.md
+@.agents/instructions/sorting_instructions.md
 
-Reusable task skills (add-app, add-docker-app, ...) live in `.agents/skills/`; Claude Code discovers them through the `.claude/skills` symlink.
+Reusable task skills (add-app, reviewing-pull-requests, ...) live in `.agents/skills/`; Claude Code discovers them through the `.claude/skills` symlink.

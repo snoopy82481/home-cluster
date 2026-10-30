@@ -6,4 +6,5 @@ TALOSCONFIG = "{{config_root}}/talosconfig"
 JUST_UNSTABLE = "1"
 
 [hooks]
-postinstall = "lefthook install"
+# Git hooks are for local development; CI installs tools without Lefthook.
+postinstall = 'if [ "${CI:-}" != "true" ]; then lefthook install; fi'
