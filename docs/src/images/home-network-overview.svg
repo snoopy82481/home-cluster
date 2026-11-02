@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1080" viewBox="0 0 1200 1080" role="img" aria-labelledby="title description">
+  <title id="title">Home network overview</title>
+  <desc id="description">Internet through a NETGEAR CM1200 modem and virtualized pfSense router to a Cisco main switch. Branches summarize wired clients and the Cisco CBS350, three wireless access points, six Talos nodes, and TrueNAS. Seven networks are listed with their subnets; all gateways use the .1 address.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M 2 2 L 10 6 L 2 10" fill="none" stroke="#e7e5df" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+    <style>
+      text { fill: #f1efe8; font-family: 'Chalkboard SE', 'Comic Sans MS', 'DejaVu Sans', sans-serif; text-anchor: middle; }
+      .heading { font-size: 32px; font-weight: 600; letter-spacing: 2px; }
+      .label { font-size: 25px; }
+      .small { font-size: 19px; fill: #b7bec4; }
+      .network { font-size: 22px; text-anchor: start; }
+      .subnet { font-family: 'DejaVu Sans Mono', monospace; font-size: 21px; text-anchor: end; }
+      .wire { fill: none; stroke: #e7e5df; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; marker-start: url(#arrow); marker-end: url(#arrow); }
+      .outline { fill: none; stroke: #e7e5df; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+      .echo { fill: none; stroke: #e7e5df; stroke-width: 0.8; opacity: .35; }
+    </style>
+  </defs>
+  <rect width="1200" height="1080" rx="28" fill="#13191d"/>
+  <path d="M 47 29 Q 25 30 29 58 L 27 1019 Q 28 1054 59 1051 L 1143 1050 Q 1172 1054 1171 1020 L 1173 59 Q 1174 27 1143 29 Z" fill="none" stroke="#d6d5cc" stroke-width="3" stroke-dasharray="10 10" stroke-linecap="round"/>
+
+  <text x="600" y="87" class="heading" >HOME NETWORK</text>
+  <ellipse class="outline" cx="280" cy="166" rx="145" ry="48" transform="rotate(-1 280 166)"/>
+  <text x="280" y="175" class="label" >Internet</text>
+  <path class="wire" d="M 280 225 Q 282.0 249.0 280 273"/>
+  <path class="outline" d="M 148 290 Q 128 291 130 310 L 131 368 Q 130 388 150 386 L 411 385 Q 432 386 430 366 L 429 308 Q 430 289 410 291 Z"/>
+  <path class="echo" transform="translate(2 -2)" d="M 148 290 Q 128 291 130 310 L 131 368 Q 130 388 150 386 L 411 385 Q 432 386 430 366 L 429 308 Q 430 289 410 291 Z"/>
+  <text x="280" y="329" class="label" >NETGEAR CM1200</text>
+  <text x="280" y="360" class="small" >Cable modem</text>
+  <path class="wire" d="M 280 400 Q 282.0 424.0 280 448"/>
+  <path class="outline" d="M 148 465 Q 128 466 130 485 L 131 565 Q 130 585 150 583 L 411 582 Q 432 583 430 563 L 429 483 Q 430 464 410 466 Z"/>
+  <path class="echo" transform="translate(2 -2)" d="M 148 465 Q 128 466 130 485 L 131 565 Q 130 585 150 583 L 411 582 Q 432 583 430 563 L 429 483 Q 430 464 410 466 Z"/>
+  <text x="280" y="508" class="label" >pfSense</text>
+  <text x="280" y="539" class="small" >Router / firewall</text>
+  <text x="280" y="565" class="small" >VM on Proxmox</text>
+  <path class="wire" d="M 280 597 Q 282.0 623.5 280 650"/>
+  <text x="847" y="169" class="label" >LAN / NETWORKS</text>
+  <path class="outline" d="M 596 188 Q 845 185 1093 189"/>
+  <circle cx="606" cy="228" r="4" fill="#d8b4fe"/>
+  <text x="625" y="235" class="network" >Default LAN</text>
+  <text x="1092" y="235" class="subnet" >192.168.0.0/24</text>
+  <circle cx="606" cy="272" r="4" fill="#f9a8d4"/>
+  <text x="625" y="279" class="network" >Voice</text>
+  <text x="1092" y="279" class="subnet" >192.168.5.0/24</text>
+  <circle cx="606" cy="316" r="4" fill="#fdba74"/>
+  <text x="625" y="323" class="network" >Management</text>
+  <text x="1092" y="323" class="subnet" >192.168.10.0/24</text>
+  <circle cx="606" cy="360" r="4" fill="#67e8f9"/>
+  <text x="625" y="367" class="network" >Server</text>
+  <text x="1092" y="367" class="subnet" >192.168.20.0/24</text>
+  <circle cx="606" cy="404" r="4" fill="#fde68a"/>
+  <text x="625" y="411" class="network" >IoT</text>
+  <text x="1092" y="411" class="subnet" >192.168.30.0/24</text>
+  <circle cx="606" cy="448" r="4" fill="#93c5fd"/>
+  <text x="625" y="455" class="network" >Guest</text>
+  <text x="1092" y="455" class="subnet" >192.168.40.0/24</text>
+  <circle cx="606" cy="492" r="4" fill="#86efac"/>
+  <text x="625" y="499" class="network" >Trusted</text>
+  <text x="1092" y="499" class="subnet" >192.168.50.0/24</text>
+  <text x="847" y="568" class="small" >Each network uses its .1 gateway</text>
+  <path class="outline" d="M 128 668 Q 108 669 110 688 L 111 758 Q 110 778 130 776 L 1071 775 Q 1092 776 1090 756 L 1089 686 Q 1090 667 1070 669 Z"/>
+  <path class="echo" transform="translate(2 -2)" d="M 128 668 Q 108 669 110 688 L 111 758 Q 110 778 130 776 L 1071 775 Q 1092 776 1090 756 L 1089 686 Q 1090 667 1070 669 Z"/>
+  <text x="600" y="714" class="label" >Cisco WS-C3650-48PD</text>
+  <text x="600" y="750" class="small" >Main switch</text>
+  <path class="wire" d="M 177 793 Q 179.0 821.5 177 850"/>
+  <path class="wire" d="M 459 793 Q 461.0 821.5 459 850"/>
+  <path class="wire" d="M 741 793 Q 743.0 821.5 741 850"/>
+  <path class="wire" d="M 1023 793 Q 1025.0 821.5 1023 850"/>
+  <path class="outline" d="M 83 866 Q 63 867 65 886 L 66 978 Q 65 998 85 996 L 270 995 Q 291 996 289 976 L 288 884 Q 289 865 269 867 Z"/>
+  <path class="echo" transform="translate(2 -2)" d="M 83 866 Q 63 867 65 886 L 66 978 Q 65 998 85 996 L 270 995 Q 291 996 289 976 L 288 884 Q 289 865 269 867 Z"/>
+  <path class="outline" d="M 365 866 Q 345 867 347 886 L 348 978 Q 347 998 367 996 L 552 995 Q 573 996 571 976 L 570 884 Q 571 865 551 867 Z"/>
+  <path class="echo" transform="translate(2 -2)" d="M 365 866 Q 345 867 347 886 L 348 978 Q 347 998 367 996 L 552 995 Q 573 996 571 976 L 570 884 Q 571 865 551 867 Z"/>
+  <path class="outline" d="M 647 866 Q 627 867 629 886 L 630 978 Q 629 998 649 996 L 834 995 Q 855 996 853 976 L 852 884 Q 853 865 833 867 Z"/>
+  <path class="echo" transform="translate(2 -2)" d="M 647 866 Q 627 867 629 886 L 630 978 Q 629 998 649 996 L 834 995 Q 855 996 853 976 L 852 884 Q 853 865 833 867 Z"/>
+  <path class="outline" d="M 929 866 Q 909 867 911 886 L 912 978 Q 911 998 931 996 L 1116 995 Q 1137 996 1135 976 L 1134 884 Q 1135 865 1115 867 Z"/>
+  <path class="echo" transform="translate(2 -2)" d="M 929 866 Q 909 867 911 886 L 912 978 Q 911 998 931 996 L 1116 995 Q 1137 996 1135 976 L 1134 884 Q 1135 865 1115 867 Z"/>
+  <text x="177" y="907" class="label" >Wired clients</text>
+  <text x="177" y="942" class="small" >Cisco CBS350</text>
+  <text x="177" y="970" class="small" >Secondary switch</text>
+  <text x="459" y="907" class="label" >Wi-Fi</text>
+  <text x="459" y="942" class="small" >3 × TP-Link</text>
+  <text x="459" y="970" class="small" >EAP660 HD</text>
+  <text x="741" y="907" class="label" >Kubernetes</text>
+  <text x="741" y="942" class="small" >Talos · 6 nodes</text>
+  <text x="741" y="970" class="small" >3 control + 3 worker</text>
+  <text x="1023" y="907" class="label" >TrueNAS</text>
+  <text x="1023" y="942" class="small" >Home storage</text>
+  <text x="1023" y="970" class="small" >Virtual machine</text>
+  <text x="600" y="1031" class="small" >Proxmox hosts pfSense, Talos and TrueNAS in the documented topology.</text>
+</svg>

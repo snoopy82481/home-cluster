@@ -54,3 +54,7 @@ wiki
 /config.yaml
 
 __pycache__
+
+# Documentation build output
+/site/
+/.cache/

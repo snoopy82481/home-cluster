@@ -1,0 +1,69 @@
+[project]
+docs_dir = "docs/src"
+exclude_docs = """
+images/*.py
+"""
+repo_name = "snoopy82481/home-cluster"
+repo_url = "https://github.com/snoopy82481/home-cluster"
+site_description = "Home infrastructure, Kubernetes, and GitOps documentation"
+site_name = "Home Operations"
+site_url = "https://snoopy82481.github.io/home-cluster/"
+use_directory_urls = false
+nav = [
+  { "Home" = "index.md" },
+  { "Architecture" = [
+    { "Overview" = "architecture/overview.md" },
+    { "GitOps" = "architecture/gitops.md" },
+    { "Network" = "network-diagram.md" },
+    { "Storage and backups" = "architecture/storage.md" },
+  ] },
+  { "Operations" = [
+    { "Repository workflow" = "operations/workflow.md" },
+  ] },
+  { "Repository" = [
+    { "Folder structure" = "repository/folder-structure.md" },
+    { "Commit messages" = "repository/semantic-git-messages.md" },
+    { "Documentation site" = "repository/documentation.md" },
+  ] },
+]
+
+[project.theme]
+favicon = "images/logo.png"
+features = [
+  "content.code.copy",
+  "navigation.sections",
+  "navigation.tabs",
+  "navigation.top",
+  "toc.follow",
+]
+logo = "images/logo.png"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: light)"
+scheme = "default"
+primary = "teal"
+accent = "cyan"
+toggle.icon = "lucide/moon"
+toggle.name = "Switch to dark mode"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: dark)"
+scheme = "slate"
+primary = "teal"
+accent = "cyan"
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to light mode"
+
+[project.markdown_extensions]
+admonition = {}
+attr_list = {}
+pymdownx.details = {}
+pymdownx.highlight = {}
+pymdownx.superfences.custom_fences = [
+  { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" },
+]
+toc.permalink = true
+
+[project.validation]
+invalid_link_anchors = true
+invalid_links = true
