@@ -22,7 +22,7 @@ _... managed with Flux, Renovate, and GitHub Actions_ <img src="https://fonts.gs
 [![Talos][talos_shield]][talos_url]&nbsp;&nbsp;
 [![kubernetes][kubernetes_shield]][kubernetes_url]&nbsp;&nbsp;
 [![Flux][flux_shield]][flux_url]&nbsp;&nbsp;
-[![Renovate][workflow_shield]][workflow_url]
+![Renovate][workflow_shield]
 
 </div>
 
@@ -245,7 +245,7 @@ There is a lot of code jacking from:
 
 <!-- IMAGE SHIELDS -->
 
-[workflow_shield]: https://img.shields.io/github/actions/workflow/status/snoopy82481/home-cluster/renovate.yaml?branch=main&label&logo=renovate&color=blue
+[workflow_shield]: https://img.shields.io/badge/enabled-blue?logo=renovate
 [kubernetes_shield]: https://kromgo.idahobealefamily.com/badges/kubernetes_version
 [flux_shield]: https://kromgo.idahobealefamily.com/badges/flux_version
 [talos_shield]: https://kromgo.idahobealefamily.com/badges/talos_version
@@ -260,7 +260,6 @@ There is a lot of code jacking from:
 
 <!-- LINKS -->
 
-[workflow_url]: https://github.com/snoopy82481/home-cluster/actions/workflows/renovate.yaml
 [old_repo_url]: https://github.com/snoopy82481/new_template_k3s
 [kubernetes_url]: https://kubernetes.io
 [renovate_url]: https://www.mend.io/renovate/
