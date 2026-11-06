@@ -18,3 +18,16 @@ spec:
           kubernetes:
             deploy:
               type: GatewayNamespace
+    deployment:
+      replicas: 2
+      pod:
+        topologySpreadConstraints:
+          - labelSelector:
+              matchLabels:
+                app.kubernetes.io/instance: envoy-gateway
+                control-plane: envoy-gateway
+            maxSkew: 1
+            topologyKey: kubernetes.io/hostname
+            whenUnsatisfiable: DoNotSchedule
+    podDisruptionBudget:
+      minAvailable: 1
