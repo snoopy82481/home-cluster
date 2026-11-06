@@ -37,7 +37,16 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
 
-        replicas: 1
+        pod:
+          topologySpreadConstraints:
+            - labelSelector:
+                matchLabels:
+                  app.kubernetes.io/instance: cloudflare-tunnel
+                  app.kubernetes.io/name: cloudflare-tunnel
+              maxSkew: 1
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: DoNotSchedule
+        replicas: 2
         strategy: RollingUpdate
 
         containers:

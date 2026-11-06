@@ -3,11 +3,11 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app envoy-gateway
+  name: envoy-gateway
 spec:
   chartRef:
     kind: OCIRepository
-    name: *app
+    name: envoy-gateway
   interval: 1h
   values:
     global:
@@ -15,7 +15,19 @@ spec:
     config:
       envoyGateway:
         provider:
-          type: Kubernetes
           kubernetes:
             deploy:
               type: GatewayNamespace
+    deployment:
+      replicas: 2
+      pod:
+        topologySpreadConstraints:
+          - labelSelector:
+              matchLabels:
+                app.kubernetes.io/instance: envoy-gateway
+                control-plane: envoy-gateway
+            maxSkew: 1
+            topologyKey: kubernetes.io/hostname
+            whenUnsatisfiable: DoNotSchedule
+    podDisruptionBudget:
+      minAvailable: 1

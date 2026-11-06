@@ -3,7 +3,7 @@ name: reviewing-pull-requests
 description: Use when reviewing a pull request or Renovate update in this Flux repository, or checking what a change under kubernetes/ affects. Covers finding a dependency's upstream, breaking changes, Renovate's rules here, searching what depends on a change, and what a check proves. references/registry.md reads images and OCI charts with crane; references/rendering.md renders and diffs HelmReleases with flate.
 ---
 
-# Reviewing pull requests in home-ops
+# Reviewing pull requests in home-cluster
 
 Flux reconciles `kubernetes/` from `main`: a merge rolls out within minutes. Secrets are
 ExternalSecrets from 1Password: judge key names and mappings from the manifests.
