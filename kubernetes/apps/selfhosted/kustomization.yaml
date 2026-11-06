@@ -13,3 +13,4 @@ resources:
   - ./homepage/ks.yaml
   - ./it-tools/ks.yaml
   - ./namespace.yaml
+  - ./searxng/ks.yaml

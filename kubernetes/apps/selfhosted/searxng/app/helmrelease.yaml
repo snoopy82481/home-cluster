@@ -1,0 +1,149 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: searxng
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: searxng
+  interval: 1h
+  values:
+    controllers:
+      searxng:
+        annotations:
+          reloader.stakater.com/auto: "true"
+
+        pod:
+          labels:
+            egress.policy.home.arpa/internet: "true"
+
+          securityContext:
+            fsGroup: 977
+            fsGroupChangePolicy: "OnRootMismatch"
+            runAsGroup: 977
+            runAsUser: 977
+
+        containers:
+          app:
+            image:
+              repository: ghcr.io/searxng/searxng
+              tag: 2026.11.5-3e95f6cd2@sha256:ffad724acd87b8dd312328d18da88ddd42e5c4b1d23231594662620053c13cae
+
+            env:
+              SEARXNG_BASE_URL: https://search.idahobealefamily.com
+              SEARXNG_PORT: &port 8080
+              SEARXNG_SECRET:
+                valueFrom:
+                  secretKeyRef:
+                    key: SEARXNG_SECRET_KEY
+                    name: searxng-secret
+              SEARXNG_VALKEY_URL: redis://searxng-valkey:6379
+
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /stats
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+
+              readiness: *probes
+
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+
+            resources:
+              requests:
+                cpu: 10m
+                memory: 256Mi
+              limits:
+                memory: 2Gi
+
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                add:
+                  - CHOWN
+                  - DAC_OVERRIDE
+                  - SETGID
+                  - SETUID
+                drop:
+                  - ALL
+              readOnlyRootFilesystem: true
+
+    externalSecrets:
+      searxng:
+        data:
+          - remoteRef:
+              key: SEARXNG_SECRET_KEY
+            secretKey: SEARXNG_SECRET_KEY
+        refreshInterval: 12h
+        secretStoreRef:
+          kind: ClusterSecretStore
+          name: doppler
+        target:
+          creationPolicy: Owner
+          name: searxng-secret
+
+    networkpolicies:
+      app:
+        type: cilium
+        controller: searxng
+        egress:
+          - toEndpoints:
+              - matchLabels:
+                  app.kubernetes.io/name: searxng-valkey
+            toPorts:
+              - ports:
+                  - port: "6379"
+                    protocol: TCP
+        ingress:
+          - fromEndpoints:
+              - matchLabels:
+                  gateway.envoyproxy.io/owning-gateway-name: envoy-internal
+                  k8s:io.kubernetes.pod.namespace: networking
+            toPorts:
+              - ports:
+                  - port: "8080"
+                    protocol: TCP
+
+    persistence:
+      config:
+        type: configMap
+        name: searxng-config
+        globalMounts:
+          - path: /etc/searxng/limiter.toml
+            subPath: limiter.toml
+            readOnly: true
+          - path: /etc/searxng/settings.yml
+            subPath: settings.yaml
+            readOnly: true
+
+      tmpfs:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
+
+    route:
+      app:
+        hostnames:
+          - search.idahobealefamily.com
+        parentRefs:
+          - name: envoy-internal
+            namespace: networking
+
+    service:
+      app:
+        controller: searxng
+        ports:
+          http:
+            port: *port
