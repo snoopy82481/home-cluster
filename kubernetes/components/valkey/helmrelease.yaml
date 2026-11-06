@@ -54,7 +54,7 @@ spec:
                     command:
                       - /bin/sh
                       - -ec
-                      - 'test \"$(valkey-cli -h 127.0.0.1 ping)\" = PONG'
+                      - 'test "$(valkey-cli -h 127.0.0.1 ping)" = PONG'
                   failureThreshold: 60
                   periodSeconds: 5
                   timeoutSeconds: 2
