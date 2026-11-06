@@ -63,7 +63,27 @@ Useful examples to inspect when relevant:
 
 Inspect only the non-secret manifests needed for the task.
 
-## 2. Write the app manifests
+## 2. Prepare the app branch
+
+Once the app name is established, use `create-app/<app>` as the working branch before writing
+manifests. This naming convention overrides the default branch prefix for this workflow.
+
+Inspect the working tree and query `origin` for the branch before creating anything. If the branch
+exists locally, switch to it; if it exists only on `origin`, create a local branch tracking it.
+If neither exists, create the local branch from the current HEAD. Preserve unrelated work and do
+not reset, overwrite, or force-push an existing branch. If switching would overwrite local changes
+or the branch is checked out in another worktree, stop and report the conflict.
+
+If the remote branch is missing, publish only this branch with
+`git push --set-upstream origin create-app/<app>`, without creating a commit. If it already exists,
+set the local branch's upstream to it without pushing local commits. Verify the local branch,
+remote branch, and upstream. If the remote cannot be queried or publication fails, report the
+blocker rather than treating the branch as absent or claiming setup succeeded.
+
+Creating the missing remote branch is part of this workflow; committing app changes and pushing
+subsequent commits still require an explicit request.
+
+## 3. Write the app manifests
 
 Inspect an existing destination before editing it. Create this layout directly, adding files only
 when the selected deployment needs them:
@@ -232,7 +252,7 @@ user-managed Secrets by exact name and keys through `envFrom`, `env.valueFrom.se
 upstream chart's documented equivalent. Register an existing app-local encrypted manifest when
 needed without modifying its contents.
 
-## 3. Register the app and namespace
+## 4. Register the app and namespace
 
 For a new namespace, write `namespace.yaml` with `apiVersion: v1`, kind `Namespace`, literal
 `metadata.name: _`, and annotation `kustomize.toolkit.fluxcd.io/prune: disabled`.
@@ -251,7 +271,7 @@ kustomization when the current setup uses directory discovery.
 Apply the repository's sorting conventions to authored manifests. Do not sort arbitrary
 configuration embedded inside strings.
 
-## 4. Validate and report
+## 5. Validate and report
 
 Run these checks with the selected app and namespace:
 
@@ -274,5 +294,6 @@ missing local resources. Intentional Flux `${...}` substitutions and chart-suppo
 expressions may remain literal before their respective rendering stages.
 
 Report created files, selected deployment choices, validation results, and provisioning
-prerequisites. Distinguish local validation from runtime testing. Do not commit, push, open a PR, or
-apply resources to the cluster unless explicitly requested.
+prerequisites. Include the branch name and whether its remote branch was created or reused.
+Distinguish local validation from runtime testing. Beyond publishing the missing app branch in
+step 2, do not commit, push, open a PR, or apply resources to the cluster unless explicitly requested.
