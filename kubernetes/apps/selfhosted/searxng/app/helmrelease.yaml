@@ -39,7 +39,7 @@ spec:
                   secretKeyRef:
                     key: SEARXNG_SECRET_KEY
                     name: searxng-secret
-              SEARXNG_VALKEY_URL: redis://searxng-valkey:6379
+              SEARXNG_VALKEY_URL: "redis://searxng-valkey:6379"
 
             probes:
               liveness: &probes
