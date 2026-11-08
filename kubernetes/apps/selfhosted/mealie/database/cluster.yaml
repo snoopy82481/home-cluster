@@ -14,7 +14,7 @@ spec:
       secret:
         name: mealie-postgres-credentials
   imageName: ghcr.io/cloudnative-pg/postgresql:18.6-standard-bookworm
-  instances: 1
+  instances: 2
   postgresql:
     extensions:
       - name: vchord
