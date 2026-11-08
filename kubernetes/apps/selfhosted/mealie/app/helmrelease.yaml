@@ -115,8 +115,15 @@ spec:
 
     route:
       app:
+        annotations:
+          gethomepage.dev/description: A self-hosted recipe manager and meal planner.
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/group: Selfhosted
+          gethomepage.dev/icon: mealie
+          gethomepage.dev/name: Mealie
         hostnames:
           - "{{ .Release.Name }}.idahobealefamily.com"
+          - recipes.idahobealefamily.com
         parentRefs:
           - name: envoy-internal
             namespace: networking

@@ -33,6 +33,10 @@ layout:
   Infrastructure:
     style: row
     icon: mdi-server
+  Selfhosted:
+    style: row
+    icon: mdi-cloud
+    columns: 3
   Calendar:
     style: row
     icon: mdi-calendar
