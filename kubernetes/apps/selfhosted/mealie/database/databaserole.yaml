@@ -1,0 +1,15 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/postgresql.cnpg.io/databaserole_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: DatabaseRole
+metadata:
+  name: mealie-app
+spec:
+  cluster:
+    name: mealie-postgres
+  inRoles:
+    - mealie
+  login: true
+  name: mealie_app
+  passwordSecret:
+    name: mealie-postgres-app
