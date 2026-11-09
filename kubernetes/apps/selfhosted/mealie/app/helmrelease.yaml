@@ -37,7 +37,7 @@ spec:
           template:
             data:
               OPENAI_API_KEY: "{{ .OPENROUTER_API_KEY }}"
-              POSTGRES_PASSWORD: "{{ .MEALIE_POSTGRES_PASSWORD }}"
+              POSTGRES_PASSWORD: "{{ .MEALIE_POSTGRES_APP_PASSWORD }}"
               POSTGRES_USER: mealie_app
               POSTGRES_SERVER: mealie-postgres-rw.selfhosted.svc.cluster.local
               POSTGRES_PORT: "5432"
