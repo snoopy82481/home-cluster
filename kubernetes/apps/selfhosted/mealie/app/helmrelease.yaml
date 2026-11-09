@@ -40,7 +40,7 @@ spec:
               POSTGRES_PASSWORD: "{{ .MEALIE_POSTGRES_PASSWORD }}"
               POSTGRES_USER: mealie_app
               POSTGRES_SERVER: mealie-postgres-rw.selfhosted.svc.cluster.local
-              POSTGRES_PORT: 5432
+              POSTGRES_PORT: "5432"
 
     controllers:
       mealie:
