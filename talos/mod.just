@@ -7,7 +7,7 @@ set script-interpreter := ['bash', '-euo', 'pipefail']
 nodes := `talosctl config info -o yaml | yq -r '[.nodes[] | tostring] | join (" ")'`
 talos_version := `yq .spec.talos.version "../kubernetes/apps/system-upgrade/tuppr/upgrades/talosupgrade.yaml"`
 kubernetes_version := `yq .spec.kubernetes.version "../kubernetes/apps/system-upgrade/tuppr/upgrades/kubernetesupgrade.yaml"`
-proxmox_user := "root"
+proxmox_user := "snoopy82481"
 proxmox_host := "proxmox"
 proxmox_iso_dir := "/var/lib/vz/template/iso"
 ssh_opts := "-o BatchMode=yes -o ConnectTimeout=5"

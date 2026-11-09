@@ -19,17 +19,17 @@ apiVersion: v1alpha1
 kind: KubeAPIServerCAConfig
 issuingCA:
   cert: |
-{{ TALOS.certs.k8s.crt | indent(width=4, first=true) }}
+{{ TALOS.certs.k8s.crt | indent(4,true) }}
   key: |
-{{ TALOS.certs.k8s.key | indent(width=4, first=true) }}
+{{ TALOS.certs.k8s.key | indent(4,true) }}
 ---
 apiVersion: v1alpha1
 kind: KubeAggregatorCAConfig
 issuingCA:
   cert: |
-{{ TALOS.certs.k8saggregator.crt | indent(width=4, first=true) }}
+{{ TALOS.certs.k8saggregator.crt | indent(4,true) }}
   key: |
-{{ TALOS.certs.k8saggregator.key | indent(width=4, first=true) }}
+{{ TALOS.certs.k8saggregator.key | indent(4,true) }}
 ---
 apiVersion: v1alpha1
 kind: KubeNodeConfig
@@ -145,5 +145,5 @@ apiVersion: v1alpha1
 kind: KubeServiceAccountConfig
 issuer:
   privateKey: |
-{{ TALOS.serviceaccount.key | indent(width=4, first=true) }}
+{{ TALOS.serviceaccount.key | indent(4,true) }}
   issuerURL: https://k8s.internal:6443

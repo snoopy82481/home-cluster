@@ -136,9 +136,6 @@
   "[json][json5][jsonc]": {
     "editor.defaultFormatter": "oxc.oxc-vscode"
   },
-  "[just]": {
-    "editor.defaultFormatter": "nefrob.vscode-just-syntax"
-  },
   "[markdown]": {
     "editor.defaultFormatter": "oxc.oxc-vscode"
   },

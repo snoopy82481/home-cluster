@@ -1,0 +1,83 @@
+[tasks.proxmox-tofu]
+hide = true
+dir = "opentofu/vm"
+usage = '''
+arg "<command>" help="OpenTofu command"
+arg "[args]" var=#true help="Extra arguments for OpenTofu"
+'''
+run = '''
+eval "args=(${usage_args:-})"
+doppler run -- tofu {{ usage.command }} "${args[@]}"
+'''
+
+[tasks.proxmox-init]
+description = "Initialize proxmox OpenTofu dependencies"
+usage = 'arg "[args]" var=#true help="Extra arguments for OpenTofu init"'
+run = '''
+eval "args=(${usage_args:-})"
+mise run //infrastructure:proxmox-tofu init "${args[@]}"
+'''
+
+[tasks.proxmox-fmt]
+description = "Format proxmox OpenTofu files"
+usage = '''
+arg "[args]" var=#true help="Extra arguments for OpenTofu fmt"
+'''
+run = '''
+eval "args=(${usage_args:-})"
+mise run //infrastructure:proxmox-tofu fmt "${args[@]}"
+'''
+
+[tasks.proxmox-validate]
+description = "Validate proxmox OpenTofu configuration"
+usage = 'arg "[args]" var=#true help="Extra arguments for OpenTofu validate"'
+run = '''
+eval "args=(${usage_args:-})"
+mise run //infrastructure:proxmox-tofu validate "${args[@]}"
+'''
+
+[tasks.proxmox-plan]
+description = "Show the changes OpenTofu will make"
+usage = '''
+arg "[environment]" var=#true help="Environment to format (default: all)" default="talos"
+arg "[args]" var=#true help="Extra arguments for OpenTofu plan"
+'''
+run = '''
+eval "args=(${usage_args:-})"
+mise run //infrastructure:proxmox-tofu plan -out=${usage_environment}_plan.tfplan "${args[@]}"
+'''
+
+[tasks.proxmox-apply]
+description = "Apply proxmox OpenTofu changes"
+usage = 'arg "[args]" var=#true help="Extra arguments for OpenTofu apply"'
+run = '''
+eval "args=(${usage_args:-})"
+mise run //infrastructure:proxmox-tofu apply -auto-approve "${args[@]}"
+'''
+
+[tasks.proxmox-apply-plan]
+description = "Apply proxmox OpenTofu plan"
+usage = '''
+arg "[environment]" var=#true help="Environment to format (default: all)" default="talos"
+arg "[args]" var=#true help="Extra arguments for OpenTofu plan"
+'''
+run = '''
+eval "args=(${usage_args:-})"
+mise run //infrastructure:proxmox-tofu apply -auto-approve ${usage_environment}_plan.tfplan "${args[@]}"
+'''
+
+[tasks.proxmox-destroy]
+description = "Destroy proxmox resources"
+usage = 'arg "[args]" var=#true help="Extra arguments for OpenTofu destroy"'
+run = '''
+eval "args=(${usage_args:-})"
+mise run //infrastructure:proxmox-tofu destroy -auto-approve "${args[@]}"
+'''
+
+[tasks.proxmox-output]
+description = "Show current proxmox OpenTofu outputs"
+usage = 'arg "[args]" var=#true help="Extra arguments for OpenTofu output"'
+run = '''
+eval "args=(${usage_args:-})"
+mise run //infrastructure:proxmox-tofu output "${args[@]}"
+'''
