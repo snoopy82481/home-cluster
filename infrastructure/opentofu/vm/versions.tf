@@ -6,7 +6,7 @@ terraform {
     }
     doppler = {
       source  = "DopplerHQ/doppler"
-      version = "1.23.1"
+      version = "1.23.2"
     }
   }
   required_version = ">=1.3.0"
