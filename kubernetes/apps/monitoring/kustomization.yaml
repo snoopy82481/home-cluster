@@ -13,5 +13,6 @@ resources:
   - ./kromgo/ks.yaml
   - ./kube-prometheus-stack/ks.yaml
   #  - ./kyverno/ks.yaml
+  - ./minniverse/ks.yaml
   - ./namespace.yaml
   - ./victoria-logs/ks.yaml
