@@ -3,7 +3,7 @@
 apiVersion: monitoring.coreos.com/v1alpha1
 kind: ScrapeConfig
 metadata:
-  name: minniverse
+  name: minnieverse
 spec:
   scrapeInterval: 60s
   scrapeTimeout: 15s
@@ -11,19 +11,19 @@ spec:
 
   staticConfigs:
     - targets:
-        - minniverse.monitoring.svc.cluster.local:9100
+        - minnieverse.monitoring.svc.cluster.local:9100
       labels:
         job: node-exporter
-        instance: minniverse
-        site: minniverse
+        instance: minnieverse
+        site: minnieverse
         environment: home
         platform: raspberry-pi
 
     - targets:
-        - minniverse.monitoring.svc.cluster.local:9617
+        - minnieverse.monitoring.svc.cluster.local:9617
       labels:
         job: pihole-exporter
-        instance: minniverse
-        site: minniverse
+        instance: minnieverse
+        site: minnieverse
         environment: home
         platform: raspberry-pi
