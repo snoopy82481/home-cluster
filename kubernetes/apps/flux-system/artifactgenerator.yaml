@@ -18,22 +18,3 @@ spec:
           to: "@artifact/kubernetes/apps/{namespace}/{app}/"
         - from: "@repo/kubernetes/components/**"
           to: "@artifact/kubernetes/components/"
----
-# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/source.extensions.fluxcd.io/artifactgenerator_v1beta1.json
-apiVersion: source.extensions.fluxcd.io/v1beta1
-kind: ArtifactGenerator
-metadata:
-  name: actions-controller-runner
-spec:
-  sources:
-    - alias: repo
-      kind: GitRepository
-      name: flux-system
-  artifacts:
-    - name: actions-controller-runner
-      originRevision: "@repo"
-      copy:
-        - from: "@repo/kubernetes/apps/actions-runner-system/actions-runner-controller/runners/**"
-          to: "@artifact/kubernetes/apps/actions-runner-system/actions-runner-controller/runners/"
-        - from: "@repo/kubernetes/components/**"
-          to: "@artifact/kubernetes/components/"
