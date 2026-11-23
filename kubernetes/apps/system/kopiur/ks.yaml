@@ -14,8 +14,8 @@ spec:
   path: ./kubernetes/apps/system/kopiur/app
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: kopiur
     namespace: flux-system
   targetNamespace: system
 ---
@@ -31,7 +31,7 @@ spec:
   path: ./kubernetes/apps/system/kopiur/repository
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: kopiur
     namespace: flux-system
   targetNamespace: system

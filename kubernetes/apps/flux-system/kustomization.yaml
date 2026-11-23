@@ -8,6 +8,6 @@ components:
   - ../../components/alerts
 
 resources:
-  - ./flux-instance/ks.yaml
+  - ./artifactgenerator.yaml
   - ./flux-operator/ks.yaml
   - ./namespace.yaml

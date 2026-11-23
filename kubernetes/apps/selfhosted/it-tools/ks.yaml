@@ -9,7 +9,7 @@ spec:
   path: ./kubernetes/apps/selfhosted/it-tools/app
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: it-tools
     namespace: flux-system
   targetNamespace: selfhosted

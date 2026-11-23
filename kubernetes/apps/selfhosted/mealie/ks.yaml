@@ -17,8 +17,8 @@ spec:
   path: ./kubernetes/apps/selfhosted/mealie/database
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: mealie
     namespace: flux-system
   targetNamespace: selfhosted
 ---
@@ -39,7 +39,7 @@ spec:
       APP: mealie
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: mealie
     namespace: flux-system
   targetNamespace: selfhosted

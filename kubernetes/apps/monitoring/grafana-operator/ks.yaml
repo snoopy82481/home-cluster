@@ -9,8 +9,8 @@ spec:
   path: ./kubernetes/apps/monitoring/grafana-operator/app
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: grafana-operator
     namespace: flux-system
   targetNamespace: monitoring
 ---
@@ -26,7 +26,7 @@ spec:
   path: ./kubernetes/apps/monitoring/grafana-operator/instance
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: grafana-operator
     namespace: flux-system
   targetNamespace: monitoring
