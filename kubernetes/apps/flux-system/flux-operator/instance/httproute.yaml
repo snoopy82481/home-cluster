@@ -13,7 +13,6 @@ spec:
   parentRefs:
     - name: envoy-external
       namespace: networking
-
   rules:
     - backendRefs:
         - name: webhook-receiver

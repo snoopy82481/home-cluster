@@ -9,7 +9,7 @@ spec:
   path: ./kubernetes/apps/monitoring/minnieverse/app
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: minnieverse
     namespace: flux-system
   targetNamespace: monitoring

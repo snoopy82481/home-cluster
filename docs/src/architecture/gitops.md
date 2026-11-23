@@ -46,12 +46,12 @@ Storage, backup policies, and resource ownership need particular care.
 
 ## Source map
 
-| Concern                                       | Location                                                         |
-| :-------------------------------------------- | :--------------------------------------------------------------- |
-| Sync branch and path                          | `kubernetes/apps/flux-system/flux-instance/app/helmrelease.yaml` |
-| Application membership                        | `kubernetes/apps/<namespace>/kustomization.yaml`                 |
-| Target path, namespace, dependencies, pruning | `kubernetes/apps/<namespace>/<app>/ks.yaml`                      |
-| Chart source and values                       | Application `ocirepository.yaml` and `helmrelease.yaml` files    |
-| Checks                                        | `.github/workflows/`                                             |
+| Concern                                       | Location                                                              |
+| :-------------------------------------------- | :-------------------------------------------------------------------- |
+| Sync branch and path                          | `kubernetes/apps/flux-system/flux-operator/instance/helmrelease.yaml` |
+| Application membership                        | `kubernetes/apps/<namespace>/kustomization.yaml`                      |
+| Target path, namespace, dependencies, pruning | `kubernetes/apps/<namespace>/<app>/ks.yaml`                           |
+| Chart source and values                       | Application `ocirepository.yaml` and `helmrelease.yaml` files         |
+| Checks                                        | `.github/workflows/`                                                  |
 
 See the [repository workflow](../operations/workflow.md) for local validation.

@@ -9,8 +9,8 @@ spec:
   path: ./kubernetes/apps/monitoring/kyverno/app
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: kyverno
     namespace: flux-system
   targetNamespace: monitoring
 ---
@@ -26,7 +26,7 @@ spec:
   path: ./kubernetes/apps/monitoring/kyverno/policies
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: kyverno
     namespace: flux-system
   targetNamespace: monitoring

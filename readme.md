@@ -70,7 +70,7 @@ Applications and storage services are managed together under [`kubernetes/apps/`
 
 ### GitOps
 
-The [Flux Instance](kubernetes/apps/flux-system/flux-instance/app/helmrelease.yaml) tracks `main` and reconciles the `kubernetes/apps` path.
+The [Flux Instance](kubernetes/apps/flux-system/flux-operator/instance/helmrelease.yaml) tracks `main` and reconciles the `kubernetes/apps` path.
 Within each namespace directory, a `kustomization.yaml` includes the application's Flux Kustomizations in `ks.yaml` files.
 Those select the application manifests, target namespace, and any dependencies or health checks.
 

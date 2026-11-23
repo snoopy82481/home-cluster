@@ -9,7 +9,7 @@ spec:
   path: ./kubernetes/apps/media/flaresolverr/app
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: flaresolverr
     namespace: flux-system
   targetNamespace: media
