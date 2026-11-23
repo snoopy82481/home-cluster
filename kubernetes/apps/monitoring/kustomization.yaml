@@ -13,6 +13,7 @@ resources:
   - ./kromgo/ks.yaml
   - ./kube-prometheus-stack/ks.yaml
   #  - ./kyverno/ks.yaml
-  - ./minnieverse/ks.yaml
+  # ! Enable after official deployment of minnieverse is available at all times
+  # - ./minnieverse/ks.yaml
   - ./namespace.yaml
   - ./victoria-logs/ks.yaml
