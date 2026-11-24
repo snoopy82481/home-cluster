@@ -37,10 +37,6 @@ spec:
           template:
             data:
               OPENAI_API_KEY: "{{ .OPENROUTER_API_KEY }}"
-              POSTGRES_PASSWORD: "{{ .MEALIE_POSTGRES_APP_PASSWORD }}"
-              POSTGRES_USER: mealie_app
-              POSTGRES_SERVER: mealie-postgres-rw.selfhosted.svc.cluster.local
-              POSTGRES_PORT: "5432"
 
     controllers:
       mealie:
@@ -54,13 +50,12 @@ spec:
               tag: "v3.31.0@sha256:97e21ac96e9a8d1ee15aaf558ba3f14998936b9d6f334e40ebb4c6c2127dc12f"
 
             env:
+              API_DOCS: false
               ALLOW_SIGNUP: "false"
               BASE_URL: https://mealie.idahobealefamily.com
-              DB_ENGINE: postgres
+              SCRAPER_FLARESOLVERR_URL: http://flaresolverr.media.svc.cluster.local.:8191
               PGID: 1000
-              POSTGRES_DB: mealie
               PUID: 1000
-              OPENAI_BASE_URL: https://openrouter.ai/api/v1
               TZ: America/Boise
 
             envFrom:
@@ -121,16 +116,16 @@ spec:
           gethomepage.dev/group: Selfhosted
           gethomepage.dev/icon: mealie
           gethomepage.dev/name: Mealie
+          gethomepage.dev/widget.type: mealie
+          gethomepage.dev/version: "2"
+          gethomepage.dev/widget.url: https://mealie.idahobealefamily.com
+          gethomepage.dev/widget.key: "{{ `{{ HOMEPAGE_VAR_MEALIE_API_TOKEN }}` }}"
         hostnames:
           - "{{ .Release.Name }}.idahobealefamily.com"
           - recipes.idahobealefamily.com
         parentRefs:
-          - name: envoy-internal
+          - name: envoy-external
             namespace: networking
-        rules:
-          - backendRefs:
-              - identifier: app
-                port: 9000
 
     service:
       app:
