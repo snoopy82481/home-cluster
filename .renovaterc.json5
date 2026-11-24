@@ -2,15 +2,22 @@
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
   extends: [
     "github>home-operations/renovate-presets#12.0.0",
-    "github>home-operations/renovate-presets//apps/cnpg.json5#12.0.0",
     "github>home-operations/renovate-presets//apps/grafanaDashboards.json5#12.0.0",
     "github>home-operations/renovate-presets//apps/talosFactory.json5#12.0.0",
     ":timezone(America/Boise)",
   ],
   rebaseWhen: "conflicted",
-  terraform: {
-    managerFilePatterns: ["/(^|/)infrastructure/opentofu/.+\\.tf$/"],
-  },
+  customManagers: [
+    {
+      description: "Process CNPG extension image references",
+      customType: "regex",
+      managerFilePatterns: ["/\\.ya?ml$/"],
+      matchStrings: [
+        "reference:\\s+(?<depName>[^@\\s]+):(?<currentValue>[^@\\s/]+)(?:@(?<currentDigest>sha256:[a-f0-9]+))?",
+      ],
+      datasourceTemplate: "docker",
+    },
+  ],
   packageRules: [
     // Auto-merge rules
     {
@@ -121,12 +128,6 @@
       minimumGroupSize: 2,
     },
     {
-      description: "Keep CloudNativePG on Postgres 18 until the extension images move with it",
-      matchDatasources: ["docker"],
-      matchPackageNames: ["ghcr.io/cloudnative-pg/postgresql"],
-      allowedVersions: "/^18\\./",
-    },
-    {
       // Unites the factory installer image and the tuppr upgrade version
       description: "Talos Group",
       groupName: "talos",
@@ -135,6 +136,20 @@
         commitMessageTopic: "{{{groupName}}} group",
       },
       minimumGroupSize: 2,
+    },
+    {
+      description: "Each ClusterImageCatalog row is one Postgres major, so never move a row to the next major",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["ghcr.io/cloudnative-pg/postgresql"],
+      matchUpdateTypes: ["major"],
+      enabled: false,
+    },
+    {
+      description: "Postgres image rebuilds restart every database, so offer them weekly",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["ghcr.io/cloudnative-pg/postgresql"],
+      matchUpdateTypes: ["digest"],
+      schedule: ["before 6am on Monday"],
     },
     // Labeling rules
     {
@@ -154,4 +169,7 @@
       addLabels: ["type/digest"],
     },
   ],
+  terraform: {
+    managerFilePatterns: ["/(^|/)infrastructure/opentofu/.+\\.tf$/"],
+  },
 }
