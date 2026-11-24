@@ -60,6 +60,7 @@ spec:
         data:
           - remoteRef:
               key: MEALIE_API_KEY
+            secretKey: MEALIE_API_KEY
           - remoteRef:
               key: PFSENSE_API_KEY
             secretKey: PFSENSE_API_KEY
