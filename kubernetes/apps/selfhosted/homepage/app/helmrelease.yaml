@@ -59,6 +59,8 @@ spec:
       homepage:
         data:
           - remoteRef:
+              key: MEALIE_API_KEY
+          - remoteRef:
               key: PFSENSE_API_KEY
             secretKey: PFSENSE_API_KEY
           - remoteRef:
@@ -104,6 +106,7 @@ spec:
               HOMEPAGE_VAR_GRAFANA_ADMIN_USER: "{{ .ADMIN_USER }}"
               HOMEPAGE_VAR_LATITUDE: "{{ .LATITUDE }}"
               HOMEPAGE_VAR_LONGITUDE: "{{ .LONGITUDE }}"
+              HOMEPAGE_VAR_MEALIE_API_TOKEN: "{{ .MEALIE_API_KEY }}"
               HOMEPAGE_VAR_OMADA_ADMIN_PASSWORD: "{{ .ADMIN_PASSWORD }}"
               HOMEPAGE_VAR_OMADA_ADMIN_USER: "{{ .ADMIN_USER }}"
               HOMEPAGE_VAR_PFSENSE_API_KEY: "{{ .PFSENSE_API_KEY }}"
